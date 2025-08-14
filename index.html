@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simption Intelligent Paper Generator</title>
+    <title>Simptions Intelligent Paper Generator</title>
     
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- PRESTIGE EDITION COLOR PALETTE & THEME --- */
+        /* ---COLOR PALETTE & THEME --- */
         :root {
             --primary-color: #00796b; /* Deep Teal */
             --accent-color: #ffab40;  /* Amber/Gold */
@@ -151,12 +151,14 @@
     </style>
 </head>
 <body>
+    <!-- Theme toggle switch for light/dark mode -->
     <div class="form-check form-switch position-fixed top-0 end-0 m-3 p-3" style="z-index: 1050;">
         <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" style="cursor: pointer;">
         <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars-fill"></i></label>
     </div>
 
     <div class="container my-5">
+        <!-- Main heading and subheading for the application -->
         <div class="text-center mb-5">
             <h1 class="display-5 fw-bold" style="color: var(--text-color);">Intelligent Paper Generator</h1>
             <p class="lead" style="color: var(--text-light);">The smartest way to build assessments.</p>
@@ -167,37 +169,33 @@
             <div class="col-lg-8">
                 <div class="main-card">
                     <div class="card-header">
+                        <!-- Progress bar to show completion status -->
                         <div class="progress"><div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div></div>
                     </div>
                     <div class="card-body p-4 p-md-5">
                         <form id="paperGenerationForm" novalidate>
-                            <!-- STEP 1: BASIC DETAILS -->
+                            <!-- Step 1: Core Details of the paper -->
                             <div class="form-step active" id="step1">
                                 <h4 class="mb-4 fw-bold">Step 1: Core Details</h4>
                                 <div class="row g-4">
                                     <div class="col-12"><label for="schoolName" class="form-label">School Name</label><input type="text" class="form-control" id="schoolName" placeholder="e.g., Delhi Public School" required></div>
                                     <div class="col-md-6"><label for="schoolBoard" class="form-label">School Board</label><select id="schoolBoard" class="form-select" required><option selected disabled value="">Choose...</option><option value="CBSE">CBSE</option><option value="ICSE">ICSE</option><option value="State Board">State Board</option></select></div>
-                                    <div class="col-md-6"><label for="classSelect" class="form-label">Class</label><select id="classSelect" class="form-select" required><option selected disabled value="">Choose...</option><script>for (let i = 1; i <= 12; i++) {document.write(`<option value="${i}">${i}</option>`);}</script></select></div>
+                                    <div class="col-md-6"><label for="classSelect" class="form-label">Class</label><select id="classSelect" class="form-select" required><option selected disabled value="">Choose...</option></select></div>
                                     <div class="col-12"><label for="subjectSelect" class="form-label">Subject</label><select id="subjectSelect" class="form-select" required disabled><option selected disabled value="">Waiting for class...</option></select></div>
                                 </div>
                                 <div class="d-flex justify-content-end mt-5"><button type="button" class="btn btn-primary next-step">Next <i class="bi bi-arrow-right"></i></button></div>
                             </div>
 
-                            <!-- STEP 2: QUESTION MIX & MARKS -->
+                            <!-- Step 2: Question types and their marks -->
                             <div class="form-step" id="step2">
                                 <h4 class="mb-4 fw-bold">Step 2: Question & Marks Distribution</h4>
-                                <div class="row g-4">
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Multiple Choice</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numMCQ" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksMCQ" value="1" min="1" required></div></div></div></div>
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Fill in the Blanks</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numFill" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksFill" value="1" min="1" required></div></div></div></div>
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Short Answer</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numShort" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksShort" value="3" min="1" required></div></div></div></div>
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Long Answer</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numLong" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksLong" value="5" min="1" required></div></div></div></div>
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Matching</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numMatch" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksMatch" value="4" min="1" required></div></div></div></div>
-                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Case Study</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numCase" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksCase" value="5" min="1" required></div></div></div></div>
+                                <div class="row g-4" id="question-distribution-container">
+                                    <!-- Question type groups will be dynamically inserted here -->
                                 </div>
                                 <div class="d-flex justify-content-between mt-5"><button type="button" class="btn btn-outline-secondary prev-step"><i class="bi bi-arrow-left"></i> Previous</button><button type="button" class="btn btn-primary next-step">Next <i class="bi bi-arrow-right"></i></button></div>
                             </div>
 
-                            <!-- STEP 3: DIFFICULTY & FINALIZE -->
+                            <!-- Step 3: Difficulty distribution and final submission -->
                             <div class="form-step" id="step3">
                                 <h4 class="mb-4 fw-bold">Step 3: Difficulty Distribution</h4>
                                 <div class="distribution-bar-container">
@@ -244,14 +242,34 @@
     <!-- JAVASCRIPT LOGIC (WITH DISTRIBUTION BAR) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM ELEMENT SELECTION ---
             const form = document.getElementById('paperGenerationForm');
             const steps = Array.from(document.querySelectorAll('.form-step'));
-            const nextButtons = document.querySelectorAll('.next-step');
-            const prevButtons = document.querySelectorAll('.prev-step');
             const progressBar = document.getElementById('progressBar');
             const themeToggle = document.getElementById('themeToggle');
             let currentStep = 0;
 
+            // --- DATA AND CONFIGURATION ---
+            const subjects = {
+                junior: ['English', 'Hindi', 'Mathematics', 'Science', 'Social Studies', 'Computer Science'],
+                senior: ['English', 'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Accountancy', 'Business Studies', 'Economics', 'History', 'Computer Science']
+            };
+            const questionTypes = [
+                { id: 'MCQ', label: 'Multiple Choice', defaultMarks: 1 },
+                { id: 'Fill', label: 'Fill in the Blanks', defaultMarks: 1 },
+                { id: 'Short', label: 'Short Answer', defaultMarks: 3 },
+                { id: 'Long', label: 'Long Answer', defaultMarks: 5 },
+                { id: 'Match', label: 'Matching', defaultMarks: 4 },
+                { id: 'Case', label: 'Case Study', defaultMarks: 5 }
+            ];
+
+            // --- CORE FUNCTIONS ---
+
+            /**
+             * Validates all required fields in a given step.
+             * @param {number} stepIndex - The index of the step to validate.
+             * @returns {boolean} - True if the step is valid, false otherwise.
+             */
             const validateStep = (stepIndex) => {
                 const currentStepDiv = steps[stepIndex];
                 const inputs = currentStepDiv.querySelectorAll('input[required], select[required]');
@@ -267,11 +285,18 @@
                 return isValid;
             };
 
+            /**
+             * Updates the progress bar based on the current step.
+             */
             const updateProgressBar = () => {
                 const progress = (currentStep / (steps.length - 1)) * 100;
                 progressBar.style.width = `${progress}%`;
             };
 
+            /**
+             * Shows a specific step in the form.
+             * @param {number} stepIndex - The index of the step to show.
+             */
             const showStep = (stepIndex) => {
                 if (stepIndex > currentStep && !validateStep(currentStep)) {
                     return; 
@@ -283,49 +308,25 @@
                 updateProgressBar();
             };
 
-            nextButtons.forEach(button => button.addEventListener('click', () => {
-                if (currentStep < steps.length - 1) showStep(currentStep + 1);
-            }));
-            prevButtons.forEach(button => button.addEventListener('click', () => {
-                if (currentStep > 0) showStep(currentStep - 1);
-            }));
-            form.querySelectorAll('input[required], select[required]').forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.value && input.value !== "") input.classList.remove('is-invalid');
-                });
-            });
-
-            const classSelect = document.getElementById('classSelect');
-            const subjectSelect = document.getElementById('subjectSelect');
-            const subjects = {
-                junior: ['English', 'Hindi', 'Mathematics', 'Science', 'Social Studies', 'Computer Science'],
-                senior: ['English', 'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Accountancy', 'Business Studies', 'Economics', 'History', 'Computer Science']
-            };
-            classSelect.addEventListener('change', () => {
-                const selectedClass = parseInt(classSelect.value);
-                const subjectList = (selectedClass >= 1 && selectedClass <= 10) ? subjects.junior : subjects.senior;
-                subjectSelect.innerHTML = '<option selected disabled value="">Choose...</option>';
-                subjectList.forEach(subject => {
-                    const option = new Option(subject, subject.toLowerCase().replace(/ /g, '_'));
-                    subjectSelect.add(option);
-                });
-                subjectSelect.disabled = false;
-                updateSummary();
-            });
-            
-            const summaryFields = {
-                school: document.getElementById('summarySchool'),
-                board: document.getElementById('summaryBoard'),
-                class: document.getElementById('summaryClass'),
-                subject: document.getElementById('summarySubject'),
-                totalQuestions: document.getElementById('summaryTotalQuestions'),
-                totalMarks: document.getElementById('summaryTotalMarks')
-            };
+            /**
+             * Updates the summary panel with the latest form data.
+             */
             const updateSummary = () => {
+                const summaryFields = {
+                    school: document.getElementById('summarySchool'),
+                    board: document.getElementById('summaryBoard'),
+                    class: document.getElementById('summaryClass'),
+                    subject: document.getElementById('summarySubject'),
+                    totalQuestions: document.getElementById('summaryTotalQuestions'),
+                    totalMarks: document.getElementById('summaryTotalMarks')
+                };
+                
                 summaryFields.school.textContent = document.getElementById('schoolName').value || '...';
                 summaryFields.board.textContent = document.getElementById('schoolBoard').value || '...';
-                summaryFields.class.textContent = classSelect.value || '...';
+                summaryFields.class.textContent = document.getElementById('classSelect').value || '...';
+                const subjectSelect = document.getElementById('subjectSelect');
                 summaryFields.subject.textContent = subjectSelect.options[subjectSelect.selectedIndex]?.text || '...';
+                
                 let totalQuestions = 0, totalMarks = 0;
                 document.querySelectorAll('.question-type-group').forEach(group => {
                     const count = parseInt(group.querySelector('.question-count').value) || 0;
@@ -336,9 +337,106 @@
                 summaryFields.totalQuestions.textContent = totalQuestions;
                 summaryFields.totalMarks.textContent = totalMarks;
             };
-            form.addEventListener('input', updateSummary);
 
-            // --- NEW DISTRIBUTION BAR LOGIC ---
+            // --- EVENT LISTENERS ---
+
+            // Use event delegation for next/prev buttons
+            form.addEventListener('click', (e) => {
+                if (e.target.matches('.next-step')) {
+                    if (currentStep < steps.length - 1) showStep(currentStep + 1);
+                }
+                if (e.target.matches('.prev-step')) {
+                    if (currentStep > 0) showStep(currentStep - 1);
+                }
+            });
+
+            // Remove invalid status on input
+            form.addEventListener('input', (e) => {
+                if (e.target.matches('input[required], select[required]')) {
+                    if (e.target.value && e.target.value !== "") {
+                        e.target.classList.remove('is-invalid');
+                    }
+                }
+                // Update summary on any form input
+                updateSummary();
+            });
+
+            // Handle dynamic subjects based on class selection
+            const classSelect = document.getElementById('classSelect');
+            classSelect.addEventListener('change', () => {
+                const subjectSelect = document.getElementById('subjectSelect');
+                const selectedClass = parseInt(classSelect.value);
+                const subjectList = (selectedClass >= 1 && selectedClass <= 10) ? subjects.junior : subjects.senior;
+                subjectSelect.innerHTML = '<option selected disabled value="">Choose...</option>';
+                subjectList.forEach(subject => {
+                    const option = new Option(subject, subject.toLowerCase().replace(/ /g, '_'));
+                    subjectSelect.add(option);
+                });
+                subjectSelect.disabled = false;
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let allStepsValid = true;
+                steps.forEach((step, index) => {
+                    if (!validateStep(index)) {
+                        allStepsValid = false;
+                    }
+                });
+
+                if (!allStepsValid) {
+                    alert('Please fill all required fields before generating the paper.');
+                    for (let i = 0; i < steps.length; i++) {
+                        if (!validateStep(i)) {
+                            showStep(i);
+                            break;
+                        }
+                    }
+                    return;
+                }
+                alert('Form is valid! Ready to generate paper.');
+            });
+
+            // Theme toggle
+            themeToggle.addEventListener('change', () => {
+                document.documentElement.setAttribute('data-bs-theme', themeToggle.checked ? 'dark' : 'light');
+            });
+
+            // --- INITIALIZATION ---
+
+            // Dynamically populate class dropdown
+            for (let i = 1; i <= 12; i++) {
+                classSelect.add(new Option(i, i));
+            }
+
+            // Dynamically create question type inputs
+            const questionContainer = document.getElementById('question-distribution-container');
+            questionContainer.innerHTML = questionTypes.map(q => `
+                <div class="col-md-6 question-type-group">
+                    <label class="form-label fw-bold">${q.label}</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="input-group">
+                                <span class="input-group-text">#</span>
+                                <input type="number" class="form-control question-count" id="num${q.id}" value="0" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group">
+                                <span class="input-group-text">Marks</span>
+                                <input type="number" class="form-control marks-per-question" id="marks${q.id}" value="${q.defaultMarks}" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Initialize the first step and summary
+            showStep(0);
+            updateSummary();
+
+            // --- DISTRIBUTION BAR LOGIC ---
             const distBar = document.getElementById('distributionBar');
             const handle1 = document.getElementById('handle1');
             const handle2 = document.getElementById('handle2');
@@ -366,32 +464,20 @@
                 hardValue.textContent = `${hardPercent}%`;
             }
 
-            function makeDraggable(handle, otherHandle) {
+            function makeDraggable(handle) {
                 let isDragging = false;
-                handle.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    handle.style.cursor = 'ew-resize';
-                    document.body.style.cursor = 'ew-resize';
-                });
-                document.addEventListener('mouseup', () => {
-                    isDragging = false;
-                    handle.style.cursor = 'ew-resize';
-                    document.body.style.cursor = 'auto';
-                });
+                handle.addEventListener('mousedown', () => { isDragging = true; document.body.style.cursor = 'ew-resize'; });
+                document.addEventListener('mouseup', () => { isDragging = false; document.body.style.cursor = 'auto'; });
                 document.addEventListener('mousemove', (e) => {
                     if (!isDragging) return;
                     const rect = distBar.getBoundingClientRect();
-                    let newX = e.clientX - rect.left;
-                    let percent = (newX / rect.width) * 100;
-
+                    let percent = ((e.clientX - rect.left) / rect.width) * 100;
                     percent = Math.max(0, Math.min(100, percent));
                     
                     if (handle === handle1) {
-                        const p2 = parseFloat(handle2.style.left);
-                        percent = Math.min(percent, p2);
-                    } else { // handle === handle2
-                        const p1 = parseFloat(handle1.style.left);
-                        percent = Math.max(percent, p1);
+                        percent = Math.min(percent, parseFloat(handle2.style.left));
+                    } else {
+                        percent = Math.max(percent, parseFloat(handle1.style.left));
                     }
                     
                     handle.style.left = `${percent}%`;
@@ -399,28 +485,8 @@
                 });
             }
 
-            makeDraggable(handle1, handle2);
-            makeDraggable(handle2, handle1);
-            // --- END DISTRIBUTION BAR LOGIC ---
-
-            themeToggle.addEventListener('change', () => {
-                document.documentElement.setAttribute('data-bs-theme', themeToggle.checked ? 'dark' : 'light');
-            });
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                let allStepsValid = true;
-                steps.forEach((index) => { if (!validateStep(index)) allStepsValid = false; });
-                if (!allStepsValid) {
-                    alert('Please fill all required fields before generating the paper.');
-                    for (let i = 0; i < steps.length; i++) { if (!validateStep(i)) { showStep(i); break; } }
-                    return;
-                }
-                alert('Form is valid! Ready to generate paper.');
-            });
-
-            showStep(currentStep);
-            updateSummary();
+            makeDraggable(handle1);
+            makeDraggable(handle2);
             updateDistribution();
         });
     </script>
