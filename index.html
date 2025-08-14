@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prestige Intelligent Paper Generator</title>
+    <title>Simption Intelligent Paper Generator</title>
     
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,6 +24,9 @@
             --text-light: #64748b;
             --border-color: #e2e8f0;
             --shadow-color: rgba(100, 116, 139, 0.12);
+            --easy-color: #22c55e;
+            --medium-color: #3b82f6;
+            --hard-color: #ef4444;
         }
 
         [data-bs-theme="dark"] {
@@ -35,11 +38,13 @@
             --text-light: #94a3b8;
             --border-color: #334155;
             --shadow-color: rgba(0, 0, 0, 0.2);
+            --easy-color: #4ade80;
+            --medium-color: #60a5fa;
+            --hard-color: #f87171;
         }
 
         body {
             background-color: var(--background-color);
-            /* Subtle geometric background pattern */
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dce4f0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             font-family: 'Inter', sans-serif;
             color: var(--text-color);
@@ -49,13 +54,11 @@
              background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23334155' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
-        /* --- PRESTIGE CARD & LAYOUT STYLING --- */
         .main-card, .summary-card {
             background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-            transition: all 0.3s ease;
         }
         .main-card .card-header {
             background: transparent;
@@ -63,7 +66,6 @@
             padding: 1.25rem 1.75rem;
         }
 
-        /* --- FORM STYLING --- */
         .form-step { display: none; animation: fadeIn 0.5s ease-out; }
         .form-step.active { display: block; }
         .form-label { font-weight: 600; color: var(--text-light); font-size: 0.9rem; }
@@ -71,7 +73,6 @@
             border-radius: 8px;
             background-color: var(--background-color);
             border: 1px solid var(--border-color);
-            transition: all 0.2s;
             padding: 10px 15px;
             font-weight: 600;
         }
@@ -85,64 +86,68 @@
             animation: shake 0.4s;
         }
         
-        /* --- PRESTIGE INTERACTIVE ELEMENTS --- */
-        .btn {
-            border-radius: 8px;
-            padding: 12px 25px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            border: none;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: color-mix(in srgb, var(--primary-color) 90%, black);
-            transform: translateY(-2px);
-        }
-        .btn-success {
-             background-color: var(--accent-color);
-             color: #1e293b;
-        }
-         .btn-success:hover {
-             background-color: color-mix(in srgb, var(--accent-color) 90%, black);
-             transform: translateY(-2px);
-        }
-        .progress {
-            height: 10px;
-            border-radius: 5px;
-            background-color: var(--border-color);
-        }
-        .progress-bar {
-            background-color: var(--accent-color);
-            transition: width 0.5s ease-in-out;
-        }
+        .btn { border-radius: 8px; padding: 12px 25px; font-weight: 700; transition: all 0.2s ease; border: none; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: color-mix(in srgb, var(--primary-color) 90%, black); transform: translateY(-2px); }
+        .btn-success { background-color: var(--accent-color); color: #1e293b; }
+        .btn-success:hover { background-color: color-mix(in srgb, var(--accent-color) 90%, black); transform: translateY(-2px); }
+        .progress { height: 10px; border-radius: 5px; background-color: var(--border-color); }
+        .progress-bar { background-color: var(--accent-color); transition: width 0.5s ease-in-out; }
 
-        /* --- PRESTIGE SUMMARY PANEL --- */
         .summary-card { position: sticky; top: 2.5rem; }
         .summary-card .card-header { font-weight: 700; color: var(--text-color); background: transparent; text-align: center; font-size: 1.1rem; }
-        .summary-list .list-group-item {
-            background-color: transparent;
-            border: none;
-            padding: 0.85rem 0.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .summary-list .list-group-item { background-color: transparent; border: none; padding: 0.85rem 0.25rem; display: flex; justify-content: space-between; align-items: center; }
         .summary-list .list-group-item i { color: var(--primary-color); margin-right: 12px; font-size: 1.1rem; }
         .summary-value { font-weight: 700; color: var(--text-color); text-align: right; }
         #summaryTotalMarks { font-size: 2.25rem; color: var(--primary-color); font-weight: 700; }
+        
+        .question-type-group { padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--background-color); }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* --- NEW DISTRIBUTION BAR STYLES --- */
+        .distribution-bar-container {
+            padding: 2rem 0;
         }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        .distribution-bar {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 10px;
+            display: flex;
         }
+        .dist-segment {
+            height: 100%;
+            transition: width 0.1s;
+        }
+        .dist-segment.easy { background-color: var(--easy-color); border-radius: 10px 0 0 10px;}
+        .dist-segment.medium { background-color: var(--medium-color); }
+        .dist-segment.hard { background-color: var(--hard-color); border-radius: 0 10px 10px 0;}
+        
+        .dist-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background-color: var(--card-bg-color);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+        .dist-handle:hover {
+            box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary-color) 20%, transparent);
+        }
+        .dist-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .dist-label { font-weight: 600; }
+        .dist-label .badge { font-size: 0.9rem; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     </style>
 </head>
 <body>
@@ -153,7 +158,7 @@
 
     <div class="container my-5">
         <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold" style="color: var(--text-color);">Paper Generation Studio</h1>
+            <h1 class="display-5 fw-bold" style="color: var(--text-color);">Intelligent Paper Generator</h1>
             <p class="lead" style="color: var(--text-light);">The smartest way to build assessments.</p>
         </div>
 
@@ -182,21 +187,33 @@
                             <div class="form-step" id="step2">
                                 <h4 class="mb-4 fw-bold">Step 2: Question & Marks Distribution</h4>
                                 <div class="row g-4">
-                                    <div class="col-md-6"><label for="numMCQ" class="form-label">MCQs (1 Mark)</label><input type="number" class="form-control question-input" id="numMCQ" value="0" min="0" required></div>
-                                    <div class="col-md-6"><label for="numFillBlanks" class="form-label">Fill in the Blanks (2 Marks)</label><input type="number" class="form-control question-input" id="numFillBlanks" value="0" min="0" required></div>
-                                    <div class="col-md-6"><label for="numShort" class="form-label">Short Answer (5 Marks)</label><input type="number" class="form-control question-input" id="numShort" value="0" min="0" required></div>
-                                    <div class="col-md-6"><label for="numLong" class="form-label">Long Answer (10 Marks)</label><input type="number" class="form-control question-input" id="numLong" value="0" min="0" required></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Multiple Choice</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numMCQ" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksMCQ" value="1" min="1" required></div></div></div></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Fill in the Blanks</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numFill" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksFill" value="1" min="1" required></div></div></div></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Short Answer</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numShort" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksShort" value="3" min="1" required></div></div></div></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Long Answer</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numLong" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksLong" value="5" min="1" required></div></div></div></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Matching</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numMatch" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksMatch" value="4" min="1" required></div></div></div></div>
+                                    <div class="col-md-6 question-type-group"><label class="form-label fw-bold">Case Study</label><div class="row g-2"><div class="col-6"><div class="input-group"><span class="input-group-text">#</span><input type="number" class="form-control question-count" id="numCase" value="0" min="0" required></div></div><div class="col-6"><div class="input-group"><span class="input-group-text">Marks</span><input type="number" class="form-control marks-per-question" id="marksCase" value="5" min="1" required></div></div></div></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-5"><button type="button" class="btn btn-outline-secondary prev-step"><i class="bi bi-arrow-left"></i> Previous</button><button type="button" class="btn btn-primary next-step">Next <i class="bi bi-arrow-right"></i></button></div>
                             </div>
 
                             <!-- STEP 3: DIFFICULTY & FINALIZE -->
                             <div class="form-step" id="step3">
-                                <h4 class="mb-4 fw-bold">Step 3: Difficulty & Finalization</h4>
-                                <div class="mb-4"><label for="easySlider" class="form-label">Easy: <span id="easyValue" class="fw-bold">40%</span></label><input type="range" class="form-range difficulty-slider" id="easySlider" min="0" max="100" value="40"></div>
-                                <div class="mb-4"><label for="mediumSlider" class="form-label">Medium: <span id="mediumValue" class="fw-bold">40%</span></label><input type="range" class="form-range difficulty-slider" id="mediumSlider" min="0" max="100" value="40"></div>
-                                <div class="mb-4"><label for="hardSlider" class="form-label">Hard: <span id="hardValue" class="fw-bold">20%</span></label><input type="range" class="form-range difficulty-slider" id="hardSlider" min="0" max="100" value="20"></div>
-                                <div id="difficultyWarning" class="alert alert-warning d-none" role="alert">Total difficulty must be 100%.</div>
+                                <h4 class="mb-4 fw-bold">Step 3: Difficulty Distribution</h4>
+                                <div class="distribution-bar-container">
+                                    <div class="dist-labels">
+                                        <div class="dist-label text-success">Easy: <span class="badge text-bg-success" id="easyValue">40%</span></div>
+                                        <div class="dist-label text-primary">Medium: <span class="badge text-bg-primary" id="mediumValue">40%</span></div>
+                                        <div class="dist-label text-danger">Hard: <span class="badge text-bg-danger" id="hardValue">20%</span></div>
+                                    </div>
+                                    <div class="distribution-bar mt-2" id="distributionBar">
+                                        <div class="dist-segment easy" id="easySegment"></div>
+                                        <div class="dist-segment medium" id="mediumSegment"></div>
+                                        <div class="dist-segment hard" id="hardSegment"></div>
+                                        <div class="dist-handle" id="handle1" style="left: 40%;"></div>
+                                        <div class="dist-handle" id="handle2" style="left: 80%;"></div>
+                                    </div>
+                                </div>
                                 <div class="d-flex justify-content-between mt-5"><button type="button" class="btn btn-outline-secondary prev-step"><i class="bi bi-arrow-left"></i> Previous</button><button type="submit" class="btn btn-success btn-lg"><i class="bi bi-stars me-2"></i>Generate Paper</button></div>
                             </div>
                         </form>
@@ -224,7 +241,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC (WITH VALIDATION) -->
+    <!-- JAVASCRIPT LOGIC (WITH DISTRIBUTION BAR) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('paperGenerationForm');
@@ -240,7 +257,6 @@
                 const inputs = currentStepDiv.querySelectorAll('input[required], select[required]');
                 let isValid = true;
                 inputs.forEach(input => {
-                    // Check if input is empty or (for select) no value is chosen
                     if (!input.value || input.value === "") {
                         isValid = false;
                         input.classList.add('is-invalid');
@@ -257,7 +273,6 @@
             };
 
             const showStep = (stepIndex) => {
-                // Validate current step before proceeding
                 if (stepIndex > currentStep && !validateStep(currentStep)) {
                     return; 
                 }
@@ -268,28 +283,15 @@
                 updateProgressBar();
             };
 
-            nextButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    if (currentStep < steps.length - 1) {
-                        showStep(currentStep + 1);
-                    }
-                });
-            });
-
-            prevButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    if (currentStep > 0) {
-                        showStep(currentStep - 1);
-                    }
-                });
-            });
-
-            // Remove invalid status on input
+            nextButtons.forEach(button => button.addEventListener('click', () => {
+                if (currentStep < steps.length - 1) showStep(currentStep + 1);
+            }));
+            prevButtons.forEach(button => button.addEventListener('click', () => {
+                if (currentStep > 0) showStep(currentStep - 1);
+            }));
             form.querySelectorAll('input[required], select[required]').forEach(input => {
                 input.addEventListener('input', () => {
-                    if (input.value && input.value !== "") {
-                        input.classList.remove('is-invalid');
-                    }
+                    if (input.value && input.value !== "") input.classList.remove('is-invalid');
                 });
             });
 
@@ -310,6 +312,7 @@
                 subjectSelect.disabled = false;
                 updateSummary();
             });
+            
             const summaryFields = {
                 school: document.getElementById('summarySchool'),
                 board: document.getElementById('summaryBoard'),
@@ -318,76 +321,107 @@
                 totalQuestions: document.getElementById('summaryTotalQuestions'),
                 totalMarks: document.getElementById('summaryTotalMarks')
             };
-            const marksConfig = { numMCQ: 1, numFillBlanks: 2, numShort: 5, numLong: 10 };
             const updateSummary = () => {
                 summaryFields.school.textContent = document.getElementById('schoolName').value || '...';
                 summaryFields.board.textContent = document.getElementById('schoolBoard').value || '...';
                 summaryFields.class.textContent = classSelect.value || '...';
                 summaryFields.subject.textContent = subjectSelect.options[subjectSelect.selectedIndex]?.text || '...';
-                let totalQuestions = 0;
-                let totalMarks = 0;
-                document.querySelectorAll('.question-input').forEach(input => {
-                    const count = parseInt(input.value) || 0;
+                let totalQuestions = 0, totalMarks = 0;
+                document.querySelectorAll('.question-type-group').forEach(group => {
+                    const count = parseInt(group.querySelector('.question-count').value) || 0;
+                    const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
                     totalQuestions += count;
-                    totalMarks += count * (marksConfig[input.id] || 0);
+                    totalMarks += count * marks;
                 });
                 summaryFields.totalQuestions.textContent = totalQuestions;
                 summaryFields.totalMarks.textContent = totalMarks;
             };
             form.addEventListener('input', updateSummary);
-            const sliders = document.querySelectorAll('.difficulty-slider');
-            const valueSpans = {
-                easy: document.getElementById('easyValue'),
-                medium: document.getElementById('mediumValue'),
-                hard: document.getElementById('hardValue')
-            };
-            sliders.forEach(slider => {
-                slider.addEventListener('input', () => {
-                    let total = 0;
-                    sliders.forEach(s => total += parseInt(s.value));
-                    valueSpans.easy.textContent = `${document.getElementById('easySlider').value}%`;
-                    valueSpans.medium.textContent = `${document.getElementById('mediumSlider').value}%`;
-                    valueSpans.hard.textContent = `${document.getElementById('hardSlider').value}%`;
-                    document.getElementById('difficultyWarning').classList.toggle('d-none', total !== 100);
+
+            // --- NEW DISTRIBUTION BAR LOGIC ---
+            const distBar = document.getElementById('distributionBar');
+            const handle1 = document.getElementById('handle1');
+            const handle2 = document.getElementById('handle2');
+            const easySegment = document.getElementById('easySegment');
+            const mediumSegment = document.getElementById('mediumSegment');
+            const hardSegment = document.getElementById('hardSegment');
+            const easyValue = document.getElementById('easyValue');
+            const mediumValue = document.getElementById('mediumValue');
+            const hardValue = document.getElementById('hardValue');
+
+            function updateDistribution() {
+                const p1 = parseFloat(handle1.style.left);
+                const p2 = parseFloat(handle2.style.left);
+                
+                const easyPercent = Math.round(p1);
+                const mediumPercent = Math.round(p2 - p1);
+                const hardPercent = 100 - easyPercent - mediumPercent;
+
+                easySegment.style.width = `${easyPercent}%`;
+                mediumSegment.style.width = `${mediumPercent}%`;
+                hardSegment.style.width = `${hardPercent}%`;
+
+                easyValue.textContent = `${easyPercent}%`;
+                mediumValue.textContent = `${mediumPercent}%`;
+                hardValue.textContent = `${hardPercent}%`;
+            }
+
+            function makeDraggable(handle, otherHandle) {
+                let isDragging = false;
+                handle.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    handle.style.cursor = 'ew-resize';
+                    document.body.style.cursor = 'ew-resize';
                 });
-            });
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    handle.style.cursor = 'ew-resize';
+                    document.body.style.cursor = 'auto';
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const rect = distBar.getBoundingClientRect();
+                    let newX = e.clientX - rect.left;
+                    let percent = (newX / rect.width) * 100;
+
+                    percent = Math.max(0, Math.min(100, percent));
+                    
+                    if (handle === handle1) {
+                        const p2 = parseFloat(handle2.style.left);
+                        percent = Math.min(percent, p2);
+                    } else { // handle === handle2
+                        const p1 = parseFloat(handle1.style.left);
+                        percent = Math.max(percent, p1);
+                    }
+                    
+                    handle.style.left = `${percent}%`;
+                    updateDistribution();
+                });
+            }
+
+            makeDraggable(handle1, handle2);
+            makeDraggable(handle2, handle1);
+            // --- END DISTRIBUTION BAR LOGIC ---
+
             themeToggle.addEventListener('change', () => {
-                const theme = themeToggle.checked ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.setAttribute('data-bs-theme', themeToggle.checked ? 'dark' : 'light');
             });
+
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 let allStepsValid = true;
-                steps.forEach((step, index) => {
-                    if (!validateStep(index)) {
-                        allStepsValid = false;
-                    }
-                });
-
+                steps.forEach((index) => { if (!validateStep(index)) allStepsValid = false; });
                 if (!allStepsValid) {
                     alert('Please fill all required fields before generating the paper.');
-                    // Find and show the first invalid step
-                    for (let i = 0; i < steps.length; i++) {
-                        if (!validateStep(i)) {
-                            showStep(i);
-                            break;
-                        }
-                    }
-                    return;
-                }
-                
-                let difficultyTotal = 0;
-                sliders.forEach(s => difficultyTotal += parseInt(s.value));
-                if (difficultyTotal !== 100) {
-                    alert('Difficulty distribution must add up to 100%.');
-                    showStep(2);
+                    for (let i = 0; i < steps.length; i++) { if (!validateStep(i)) { showStep(i); break; } }
                     return;
                 }
                 alert('Form is valid! Ready to generate paper.');
-                console.log('Gathering form data for submission...');
             });
+
             showStep(currentStep);
             updateSummary();
+            updateDistribution();
         });
     </script>
 </body>
