@@ -376,27 +376,66 @@
             });
 
             // Handle form submission
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                let allStepsValid = true;
-                steps.forEach((step, index) => {
-                    if (!validateStep(index)) {
-                        allStepsValid = false;
-                    }
-                });
+            form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-                if (!allStepsValid) {
-                    alert('Please fill all required fields before generating the paper.');
-                    for (let i = 0; i < steps.length; i++) {
-                        if (!validateStep(i)) {
-                            showStep(i);
-                            break;
-                        }
-                    }
-                    return;
-                }
-                alert('Form is valid! Ready to generate paper.');
-            });
+    const payload = {
+        schoolName: document.getElementById('schoolName').value.trim(),
+        schoolBoard: document.getElementById('schoolBoard').value,
+        class: document.getElementById('classSelect').value,
+        subject: document.getElementById('subjectSelect').options[document.getElementById('subjectSelect').selectedIndex].text,
+        questionDistribution: {},
+        difficultyDistribution: {}
+    };
+
+    document.querySelectorAll('.question-type-group').forEach(group => {
+        const label = group.querySelector('.form-label.fw-bold').textContent.trim();
+        const count = parseInt(group.querySelector('.question-count').value || '0', 10);
+        const marks = parseInt(group.querySelector('.marks-per-question').value || '1', 10);
+        if (count > 0) {
+            payload.questionDistribution[label] = { count, marks };
+        }
+    });
+
+    const easy = parseInt(document.getElementById('easyValue').textContent.replace('%',''), 10);
+    const medium = parseInt(document.getElementById('mediumValue').textContent.replace('%',''), 10);
+    const hard = parseInt(document.getElementById('hardValue').textContent.replace('%',''), 10);
+    payload.difficultyDistribution = { Easy: easy, Medium: medium, Hard: hard };
+
+    try {
+        const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('API error ' + res.status);
+        const data = await res.json();
+        renderGeneratedPaper(data);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+});
+
+function renderGeneratedPaper(data) {
+    let container = document.getElementById('generatedPaper');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'generatedPaper';
+        container.className = 'container my-4';
+        document.body.appendChild(container);
+    }
+    const { summary, questions } = data || {};
+    container.innerHTML = `
+        <h3>Generated Paper</h3>
+        <p><strong>Total Questions:</strong> ${summary?.total_questions || 0}</p>
+        <p><strong>Total Marks:</strong> ${summary?.total_marks || 0}</p>
+        <ol>
+            ${(questions || []).map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] - ${q.question}</li>`).join('')}
+        </ol>
+    `;
+}
+
 
             // Theme toggle
             themeToggle.addEventListener('change', () => {
