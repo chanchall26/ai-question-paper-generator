@@ -87,16 +87,27 @@
     .preview-card { border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:0 6px 16px -8px var(--shadow); margin-top:1rem; }
 
     /* Saved Templates button (moved to top-left) */
-    #openTemplatesBtn { position:fixed; top:20px; left:20px; z-index:1080; border-radius:8px; padding:.5rem .9rem; font-weight:700; }
-    #openPapersBtn{
-  position:fixed;
-  top:70px;          /* sits just below Saved Templates */
-  left:20px;
-  z-index:1080;
-  border-radius:8px;
-  padding:.5rem .9rem;
-  font-weight:700;
+  /* Toolbar container (fixed on top-left) */
+/* Toolbar container (fixed on top-left) */
+#toolbar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;   /* lower than Bootstrap offcanvas */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
+
+/* Buttons inside toolbar */
+#toolbar button {
+  border-radius: 8px;
+  padding: .5rem .9rem;
+  font-weight: 700;
+}
+
+
+
 
 
     /* Small summary styles */
@@ -296,14 +307,19 @@
   </div>
 
   <!-- Top-left Saved Templates button (replaces floating bottom-right) -->
-  <button id="openTemplatesBtn" class="btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas" aria-controls="templatesOffcanvas" title="Saved Templates">
+<div id="toolbar">
+  <button id="openTemplatesBtn" class="btn btn-outline-primary"
+          data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas"
+          aria-controls="templatesOffcanvas" title="Saved Templates">
     <i class="bi bi-collection me-1"></i> Saved Templates
   </button>
+
   <button id="openPapersBtn" class="btn btn-outline-success"
-        data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
-        aria-controls="papersOffcanvas" title="Generated Papers">
-  <i class="bi bi-journals me-1"></i> Generated Papers
-</button>
+          data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
+          aria-controls="papersOffcanvas" title="Generated Papers">
+    <i class="bi bi-journals me-1"></i> Generated Papers
+  </button>
+</div>
 
 
   <!-- Offcanvas Sidebar for Saved Templates (left) -->
@@ -689,47 +705,94 @@ const generatedPapersGrid = document.getElementById('generatedPapersGrid');
     // save templates
     saveQuickBtn.addEventListener('click', saveTemplate);
 
-    // generate preview button (only in Step 3)
-    generatePaperBtn.addEventListener('click', () => {
-      // validate required fields across steps (schoolName, board, class, subject)
-      const requireds = document.querySelectorAll('#step-1 input[required], #step-1 select[required]');
-      let ok = true;
-      requireds.forEach(el => { if (!el.value || el.value === '') { el.classList.add('is-invalid'); ok = false; } else el.classList.remove('is-invalid'); });
-      if (!ok) { alert('Please complete required fields in Step 1 before generating preview.'); showStep(0); return; }
 
-      const payload = buildPayload();
-      showGeneratedPreview(payload);
-      saveGeneratedPaper(payload);
-renderGeneratedPapers();
+// generate preview button (only in Step 3)
+generatePaperBtn.addEventListener('click', async () => {
+  // validate Step 1 fields
+  const requireds = document.querySelectorAll('#step-1 input[required], #step-1 select[required]');
+  let ok = true;
+  requireds.forEach(el => {
+    if (!el.value) { el.classList.add('is-invalid'); ok = false; }
+    else el.classList.remove('is-invalid');
+  });
+  if (!ok) {
+    alert('Please complete required fields in Step 1 before generating preview.');
+    showStep(0);
+    return;
+  }
 
+  const payload = buildPayload();
 
-      // scroll to the preview container inside step 3
-      const container = document.getElementById('generatedPaperContainer');
-      if (container) container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
+    if (!res.ok) throw new Error(`API error ${res.status}`);
 
-    // form submit (kept for optional API integration)
-    paperForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = buildPayload();
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('API error ' + res.status);
-        const data = await res.json();
-        showGenerated(data);
-      } catch (err) {
-        // fallback: show preview totals (still displayed inside step 3)
-        showGeneratedPreview({
-          ...payload,
-          questionTotals: payload.questionTotals
-        });
-        console.warn('Generate API mock:', err.message);
-      }
-    });
+    const data = await res.json();
+
+    // Defensive fallbacks if backend keys differ
+    const questions = Array.isArray(data.questions) ? data.questions : [];
+    const totalQ = data.summary?.total_questions ?? questions.length ?? 0;
+    const totalM = data.summary?.total_marks ?? 0;
+
+    const pdfUrl    = data.pdf_url    || '#';
+    const wordUrl   = data.word_url   || '#';
+    const answerUrl = data.answer_key_url || '#';
+
+    const container = document.getElementById('generatedPaperContainer');
+    container.innerHTML = `
+      <div class="preview-card">
+        <h5 class="mb-3">Generated Paper</h5>
+        <p><strong>Total Questions:</strong> ${totalQ}</p>
+        <p><strong>Total Marks:</strong> ${totalM}</p>
+        <ol>
+          ${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}
+        </ol>
+        <div class="d-flex gap-2 mt-3">
+          <a href="${pdfUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+          </a>
+          <a href="${wordUrl}" target="_blank" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-file-earmark-word me-1"></i>Download Word
+          </a>
+          <a href="${answerUrl}" target="_blank" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-journal-text me-1"></i>Download Answer Key
+          </a>
+        </div>
+      </div>
+    `;
+
+    // Scroll to preview
+    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  } catch (err) {
+    console.error(err);
+    alert('Failed to generate paper from backend. Check server logs.');
+  }
+});
+
+
+
+    // Show backend-generated paper
+    const container = document.getElementById('generatedPaperContainer');
+    container.innerHTML = `
+      <div class="preview-card">
+        <h5 class="mb-3">Generated Paper</h5>
+        <p><strong>Total Questions:</strong> ${data.summary.total_questions}</p>
+        <p><strong>Total Marks:</strong> ${data.summary.total_marks}</p>
+        <ol>${data.questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}</ol>
+        <div class="d-flex gap-2 mt-3">
+          <a href="${data.pdf_url}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</a>
+          <a href="${data.word_url}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</a>
+          <a href="${data.answer_key_url}" target="_blank" class="btn btn-outline-success btn-sm"><i class="bi bi-journal-text me-1"></i>Download Answer Key</a>
+        </div>
+      </div>
+    `;
+
+  } 
 
     // update summary on inputs
     paperForm.addEventListener('input', (e) => {
@@ -753,7 +816,7 @@ renderGeneratedPapers();
     // ensure handles start at 40% and 80%
     handle1.style.left = '40%'; handle2.style.left = '80%';
     updateDistribution();
-  }
+  
 
   /* ===================== Steps & Validation ===================== */
   function validateStep(idx) {
@@ -911,68 +974,31 @@ renderGeneratedPapers();
     `;
     container.innerHTML = html;
 
-    // placeholder actions (no backend implemented)
-    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-      alert('Download PDF: placeholder. Connect backend or implement client export to enable.');
-    });
-    document.getElementById('downloadWordBtn').addEventListener('click', () => {
-      alert('Download Word: placeholder. Connect backend or implement client export to enable.');
-    });
-    document.getElementById('saveFromPreviewBtn').addEventListener('click', () => {
-      saveTemplate(); // reuse saveTemplate to persist current payload
-      renderTemplates();
-      alert('Template saved locally from preview.');
-    });
-    document.getElementById('downloadAnswerKeyBtn').addEventListener('click', () => {
-  downloadAnswerKeyFor(payload);
+// save current preview as template
+document.getElementById('saveFromPreviewBtn').addEventListener('click', () => {
+  saveTemplate(); // reuse saveTemplate to persist current payload
+  renderTemplates();
+  alert('Template saved locally from preview.');
 });
 
-  }
-  document.getElementById('downloadAnswerKeyBtn').addEventListener('click', () => {
-  // Build a simple answer key text
-  const answerKey = `
-Answer Key
-School: ${payload.schoolName}
-Board: ${payload.schoolBoard}
-Class: ${payload.class}
-Subject: ${payload.subject}
-
-Chapters: ${payload.chapters.join(', ') || '—'}
-
-Questions: ${payload.questionTotals.totalQuestions}
-Marks: ${payload.questionTotals.totalMarks}
-
-(Provide actual answers here — currently just a placeholder.)
-`;
-
-  // Create downloadable file
-  const blob = new Blob([answerKey], { type: 'text/plain' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = "Answer_Key.txt";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-});
-
-
-  /* ===================== showGenerated (old API fallback) ===================== */
-  function showGenerated(data){
-    const container = document.getElementById('generatedPaperContainer');
-    const summary = data.summary || data || {};
-    const questions = data.questions || [];
-    container.innerHTML = `
-      <div class="main-card p-4 my-4">
-        <h4 class="mb-3">Generated Paper</h4>
-        <p><strong>Total Questions:</strong> ${summary.total_questions || summary.totalQuestions || 0}</p>
-        <p><strong>Total Marks:</strong> ${summary.total_marks || summary.totalMarks || 0}</p>
-        <ol class="mt-3">${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}</ol>
-      </div>
-    `;
-    function showGenerated(data){
+/* ===================== showGenerated (old API fallback) ===================== */
+function showGenerated(data) {
   const container = document.getElementById('generatedPaperContainer');
   const summary = data.summary || data || {};
   const questions = data.questions || [];
+
+  container.innerHTML = `
+    <div class="main-card p-4 my-4">
+      <h4 class="mb-3">Generated Paper</h4>
+      <p><strong>Total Questions:</strong> ${summary.total_questions || summary.totalQuestions || 0}</p>
+      <p><strong>Total Marks:</strong> ${summary.total_marks || summary.totalMarks || 0}</p>
+      <ol class="mt-3">
+        ${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}
+      </ol>
+    </div>
+  `;
+}
+
 
   // build a normalized payload for saving (fallbacks to current form if API omits fields)
   const paperPayload = {
@@ -1001,7 +1027,7 @@ Marks: ${payload.questionTotals.totalMarks}
   `;
 }
 
-  }
+  
 
   /* ===================== Distribution bar logic ===================== */
   function updateDistribution(){
