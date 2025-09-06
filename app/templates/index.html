@@ -692,26 +692,8 @@ const generatedPapersGrid = document.getElementById('generatedPapersGrid');
 
 // generate preview button (only in Step 3)
 generatePaperBtn.addEventListener('click', async () => {
-<<<<<<< HEAD
   // ... (unchanged validation code) ...
   const payload = buildPayload();
-=======
-  // validate Step 1 fields
-  const requireds = document.querySelectorAll('#step-1 input[required], #step-1 select[required]');
-  let ok = true;
-  requireds.forEach(el => {
-    if (!el.value) { el.classList.add('is-invalid'); ok = false; }
-    else el.classList.remove('is-invalid');
-  });
-  if (!ok) {
-    alert('Please complete required fields in Step 1 before generating preview.');
-    showStep(0);
-    return;
-  }
-
-  const payload = buildPayload();
-
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -719,28 +701,14 @@ generatePaperBtn.addEventListener('click', async () => {
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(`API error ${res.status}`);
-<<<<<<< HEAD
     const data = await res.json();
-=======
-
-    const data = await res.json();
-
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
     // Defensive fallbacks if backend keys differ
     const questions = Array.isArray(data.questions) ? data.questions : [];
     const totalQ = data.summary?.total_questions ?? questions.length ?? 0;
     const totalM = data.summary?.total_marks ?? 0;
-<<<<<<< HEAD
     const pdfUrl    = data.pdf_url    || '#';
     const wordUrl   = data.word_url   || '#';
     const answerUrl = data.answer_key_url || '#';
-=======
-
-    const pdfUrl    = data.pdf_url    || '#';
-    const wordUrl   = data.word_url   || '#';
-    const answerUrl = data.answer_key_url || '#';
-
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
     const container = document.getElementById('generatedPaperContainer');
     container.innerHTML = `
       <div class="preview-card">
@@ -748,11 +716,7 @@ generatePaperBtn.addEventListener('click', async () => {
         <p><strong>Total Questions:</strong> ${totalQ}</p>
         <p><strong>Total Marks:</strong> ${totalM}</p>
         <ol>
-<<<<<<< HEAD
           ${questions.map(q => `<li>${q.type || q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
-=======
-          ${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
         </ol>
         <div class="d-flex gap-2 mt-3">
           <a href="${pdfUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
@@ -767,18 +731,11 @@ generatePaperBtn.addEventListener('click', async () => {
         </div>
       </div>
     `;
-<<<<<<< HEAD
     // Update live preview numbers (right panel) after paper generation
     // miniQuestions.textContent = totalQ;
     // miniMarks.textContent = totalM;
     // Scroll to preview
     container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-=======
-
-    // Scroll to preview
-    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
   } catch (err) {
     console.error(err);
     alert('Failed to generate paper from backend. Check server logs.');
@@ -794,11 +751,7 @@ generatePaperBtn.addEventListener('click', async () => {
         <h5 class="mb-3">Generated Paper</h5>
         <p><strong>Total Questions:</strong> ${data.summary.total_questions}</p>
         <p><strong>Total Marks:</strong> ${data.summary.total_marks}</p>
-<<<<<<< HEAD
         <ol>${data.questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
-=======
-        <ol>${data.questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}</ol>
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
         <div class="d-flex gap-2 mt-3">
           <a href="${data.pdf_url}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</a>
           <a href="${data.word_url}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</a>
@@ -890,7 +843,6 @@ generatePaperBtn.addEventListener('click', async () => {
 }
 
 
-<<<<<<< HEAD
  function updateSummary(){
   const exam = examNameEl.value || '...';
   const school = schoolNameEl.value || '...';
@@ -917,35 +869,6 @@ generatePaperBtn.addEventListener('click', async () => {
   miniQuestions.textContent = totalQ;
   miniMarks.textContent = totalMarks;
 }
-=======
-  /* ===================== Summary ===================== */
-    function updateSummary(){
-    const exam = examNameEl.value || '...';
-    const school = schoolNameEl.value || '...';
-    const board = boardEl.value || '...';
-    const cls = classEl.value || '...';
-    const subj = subjectEl.value || '...';
-    const selectedCh = Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value);
-    const qGroups = Array.from(document.querySelectorAll('.question-type-group'));
-    let totalQ = 0, totalMarks = 0;
-    qGroups.forEach(group => {
-      const count = parseInt(group.querySelector('.question-count').value) || 0;
-      const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
-      totalQ += count;
-      totalMarks += count * marks;
-    });
-
-    // mini summary
-    miniSchool.textContent = school;
-    miniExam.textContent = exam;
-    miniBoard.textContent = board;
-    miniClass.textContent = cls;
-    miniSubject.textContent = subj;
-    miniChapters.textContent = selectedCh.join(', ') || '...';
-    miniQuestions.textContent = totalQ;
-    miniMarks.textContent = totalMarks;
-  }
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
 
   /* ===================== Build payload ===================== */
   function buildPayload(){
@@ -1037,11 +960,7 @@ function showGenerated(data) {
       <p><strong>Total Questions:</strong> ${summary.total_questions || summary.totalQuestions || 0}</p>
       <p><strong>Total Marks:</strong> ${summary.total_marks || summary.totalMarks || 0}</p>
       <ol class="mt-3">
-<<<<<<< HEAD
         ${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
-=======
-        ${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
       </ol>
     </div>
   `;
@@ -1070,11 +989,7 @@ function showGenerated(data) {
       <h4 class="mb-3">Generated Paper</h4>
       <p><strong>Total Questions:</strong> ${paperPayload.questionTotals.totalQuestions}</p>
       <p><strong>Total Marks:</strong> ${paperPayload.questionTotals.totalMarks}</p>
-<<<<<<< HEAD
       <ol class="mt-3">${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
-=======
-      <ol class="mt-3">${questions.map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] — ${q.question}</li>`).join('')}</ol>
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
     </div>
   `;
 }
