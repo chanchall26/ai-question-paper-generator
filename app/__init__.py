@@ -7,14 +7,7 @@ import google.generativeai as genai
 
 load_dotenv()
 db = SQLAlchemy()
-<<<<<<< HEAD
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-=======
-
-# Configure Gemini AI
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
->>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
 
 def create_app():
     app = Flask(__name__, template_folder="templates", static_folder="static")
