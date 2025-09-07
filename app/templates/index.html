@@ -1,533 +1,1284 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simptions Intelligent Paper Generator</title>
-    
-    <!-- Bootstrap CSS & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simptions Intelligent Paper Generator — Full</title>
 
-    <style>
-        /* ---COLOR PALETTE & THEME --- */
-        :root {
-            --primary-color: #00796b; /* Deep Teal */
-            --accent-color: #ffab40;  /* Amber/Gold */
-            --background-color: #f5f7fa;
-            --card-bg-color: #ffffff;
-            --text-color: #334155;
-            --text-light: #64748b;
-            --border-color: #e2e8f0;
-            --shadow-color: rgba(100, 116, 139, 0.12);
-            --easy-color: #22c55e;
-            --medium-color: #3b82f6;
-            --hard-color: #ef4444;
-        }
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-        [data-bs-theme="dark"] {
-            --primary-color: #26a69a;
-            --accent-color: #ffd180;
-            --background-color: #0f172a;
-            --card-bg-color: #1e293b;
-            --text-color: #cbd5e1;
-            --text-light: #94a3b8;
-            --border-color: #334155;
-            --shadow-color: rgba(0, 0, 0, 0.2);
-            --easy-color: #4ade80;
-            --medium-color: #60a5fa;
-            --hard-color: #f87171;
-        }
-
-        body {
-            background-color: var(--background-color);
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dce4f0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-        }
-        
-        [data-bs-theme="dark"] body {
-             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23334155' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .main-card, .summary-card {
-            background-color: var(--card-bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-        }
-        .main-card .card-header {
-            background: transparent;
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.25rem 1.75rem;
-        }
-
-        .form-step { display: none; animation: fadeIn 0.5s ease-out; }
-        .form-step.active { display: block; }
-        .form-label { font-weight: 600; color: var(--text-light); font-size: 0.9rem; }
-        .form-control, .form-select {
-            border-radius: 8px;
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            padding: 10px 15px;
-            font-weight: 600;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
-            background-color: var(--card-bg-color);
-        }
-        .form-control.is-invalid, .form-select.is-invalid {
-            border-color: #dc3545;
-            animation: shake 0.4s;
-        }
-        
-        .btn { border-radius: 8px; padding: 12px 25px; font-weight: 700; transition: all 0.2s ease; border: none; }
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: color-mix(in srgb, var(--primary-color) 90%, black); transform: translateY(-2px); }
-        .btn-success { background-color: var(--accent-color); color: #1e293b; }
-        .btn-success:hover { background-color: color-mix(in srgb, var(--accent-color) 90%, black); transform: translateY(-2px); }
-        .progress { height: 10px; border-radius: 5px; background-color: var(--border-color); }
-        .progress-bar { background-color: var(--accent-color); transition: width 0.5s ease-in-out; }
-
-        .summary-card { position: sticky; top: 2.5rem; }
-        .summary-card .card-header { font-weight: 700; color: var(--text-color); background: transparent; text-align: center; font-size: 1.1rem; }
-        .summary-list .list-group-item { background-color: transparent; border: none; padding: 0.85rem 0.25rem; display: flex; justify-content: space-between; align-items: center; }
-        .summary-list .list-group-item i { color: var(--primary-color); margin-right: 12px; font-size: 1.1rem; }
-        .summary-value { font-weight: 700; color: var(--text-color); text-align: right; }
-        #summaryTotalMarks { font-size: 2.25rem; color: var(--primary-color); font-weight: 700; }
-        
-        .question-type-group { padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--background-color); }
-
-        /* --- NEW DISTRIBUTION BAR STYLES --- */
-        .distribution-bar-container {
-            padding: 2rem 0;
-        }
-        .distribution-bar {
-            position: relative;
-            width: 100%;
-            height: 20px;
-            background-color: var(--border-color);
-            border-radius: 10px;
-            display: flex;
-        }
-        .dist-segment {
-            height: 100%;
-            transition: width 0.1s;
-        }
-        .dist-segment.easy { background-color: var(--easy-color); border-radius: 10px 0 0 10px;}
-        .dist-segment.medium { background-color: var(--medium-color); }
-        .dist-segment.hard { background-color: var(--hard-color); border-radius: 0 10px 10px 0;}
-        
-        .dist-handle {
-            position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 24px;
-            height: 24px;
-            background-color: var(--card-bg-color);
-            border: 3px solid var(--primary-color);
-            border-radius: 50%;
-            cursor: ew-resize;
-            z-index: 10;
-        }
-        .dist-handle:hover {
-            box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary-color) 20%, transparent);
-        }
-        .dist-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-        }
-        .dist-label { font-weight: 600; }
-        .dist-label .badge { font-size: 0.9rem; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-    </style>
-</head>
-<body>
-    <!-- Theme toggle switch for light/dark mode -->
-    <div class="form-check form-switch position-fixed top-0 end-0 m-3 p-3" style="z-index: 1050;">
-        <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" style="cursor: pointer;">
-        <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars-fill"></i></label>
-    </div>
-
-    <div class="container my-5">
-        <!-- Main heading and subheading for the application -->
-        <div class="text-center mb-5">
-            <h1 class="display-5 fw-bold" style="color: var(--text-color);">Intelligent Paper Generator</h1>
-            <p class="lead" style="color: var(--text-light);">The smartest way to build assessments.</p>
-        </div>
-
-        <div class="row g-5">
-            <!-- Main Form Column -->
-            <div class="col-lg-8">
-                <div class="main-card">
-                    <div class="card-header">
-                        <!-- Progress bar to show completion status -->
-                        <div class="progress"><div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div></div>
-                    </div>
-                    <div class="card-body p-4 p-md-5">
-                        <form id="paperGenerationForm" novalidate>
-                            <!-- Step 1: Core Details of the paper -->
-                            <div class="form-step active" id="step1">
-                                <h4 class="mb-4 fw-bold">Step 1: Core Details</h4>
-                                <div class="row g-4">
-                                    <div class="col-12"><label for="schoolName" class="form-label">School Name</label><input type="text" class="form-control" id="schoolName" placeholder="e.g., Delhi Public School" required></div>
-                                    <div class="col-md-6"><label for="schoolBoard" class="form-label">School Board</label><select id="schoolBoard" class="form-select" required><option selected disabled value="">Choose...</option><option value="CBSE">CBSE</option><option value="ICSE">ICSE</option><option value="State Board">State Board</option></select></div>
-                                    <div class="col-md-6"><label for="classSelect" class="form-label">Class</label><select id="classSelect" class="form-select" required><option selected disabled value="">Choose...</option></select></div>
-                                    <div class="col-12"><label for="subjectSelect" class="form-label">Subject</label><select id="subjectSelect" class="form-select" required disabled><option selected disabled value="">Waiting for class...</option></select></div>
-                                </div>
-                                <div class="d-flex justify-content-end mt-5"><button type="button" class="btn btn-primary next-step">Next <i class="bi bi-arrow-right"></i></button></div>
-                            </div>
-
-                            <!-- Step 2: Question types and their marks -->
-                            <div class="form-step" id="step2">
-                                <h4 class="mb-4 fw-bold">Step 2: Question & Marks Distribution</h4>
-                                <div class="row g-4" id="question-distribution-container">
-                                    <!-- Question type groups will be dynamically inserted here -->
-                                </div>
-                                <div class="d-flex justify-content-between mt-5"><button type="button" class="btn btn-outline-secondary prev-step"><i class="bi bi-arrow-left"></i> Previous</button><button type="button" class="btn btn-primary next-step">Next <i class="bi bi-arrow-right"></i></button></div>
-                            </div>
-
-                            <!-- Step 3: Difficulty distribution and final submission -->
-                            <div class="form-step" id="step3">
-                                <h4 class="mb-4 fw-bold">Step 3: Difficulty Distribution</h4>
-                                <div class="distribution-bar-container">
-                                    <div class="dist-labels">
-                                        <div class="dist-label text-success">Easy: <span class="badge text-bg-success" id="easyValue">40%</span></div>
-                                        <div class="dist-label text-primary">Medium: <span class="badge text-bg-primary" id="mediumValue">40%</span></div>
-                                        <div class="dist-label text-danger">Hard: <span class="badge text-bg-danger" id="hardValue">20%</span></div>
-                                    </div>
-                                    <div class="distribution-bar mt-2" id="distributionBar">
-                                        <div class="dist-segment easy" id="easySegment"></div>
-                                        <div class="dist-segment medium" id="mediumSegment"></div>
-                                        <div class="dist-segment hard" id="hardSegment"></div>
-                                        <div class="dist-handle" id="handle1" style="left: 40%;"></div>
-                                        <div class="dist-handle" id="handle2" style="left: 80%;"></div>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-between mt-5"><button type="button" class="btn btn-outline-secondary prev-step"><i class="bi bi-arrow-left"></i> Previous</button><button type="submit" class="btn btn-success btn-lg"><i class="bi bi-stars me-2"></i>Generate Paper</button></div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Live Summary Column -->
-            <div class="col-lg-4">
-                <div class="summary-card">
-                    <div class="card-header"><i class="bi bi-clipboard-data me-2"></i>Live Preview</div>
-                    <div class="card-body p-4">
-                        <ul class="list-group list-group-flush summary-list">
-                            <li class="list-group-item"><i class="bi bi-building"></i><span>School</span> <span id="summarySchool" class="summary-value">...</span></li>
-                            <li class="list-group-item"><i class="bi bi-journal-check"></i><span>Board</span> <span id="summaryBoard" class="summary-value">...</span></li>
-                            <li class="list-group-item"><i class="bi bi-person-video2"></i><span>Class</span> <span id="summaryClass" class="summary-value">...</span></li>
-                            <li class="list-group-item"><i class="bi bi-book-half"></i><span>Subject</span> <span id="summarySubject" class="summary-value">...</span></li>
-                            <li class="list-group-item"><i class="bi bi-question-circle"></i><span>Questions</span> <span id="summaryTotalQuestions" class="summary-value">0</span></li>
-                            <li class="list-group-item flex-column align-items-center pt-3"><strong class="fs-6 text-uppercase" style="color: var(--text-light);">Total Marks</strong><strong id="summaryTotalMarks">0</strong></li>
-                        </ul>
-                        <div class="d-grid mt-4"><button type="button" class="btn btn-outline-primary"><i class="bi bi-save me-2"></i>Save as Template</button></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC (WITH DISTRIBUTION BAR) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM ELEMENT SELECTION ---
-            const form = document.getElementById('paperGenerationForm');
-            const steps = Array.from(document.querySelectorAll('.form-step'));
-            const progressBar = document.getElementById('progressBar');
-            const themeToggle = document.getElementById('themeToggle');
-            let currentStep = 0;
-
-            // --- DATA AND CONFIGURATION ---
-            const subjects = {
-                junior: ['English', 'Hindi', 'Mathematics', 'Science', 'Social Studies', 'Computer Science'],
-                senior: ['English', 'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Accountancy', 'Business Studies', 'Economics', 'History', 'Computer Science']
-            };
-            const questionTypes = [
-                { id: 'MCQ', label: 'Multiple Choice', defaultMarks: 1 },
-                { id: 'Fill', label: 'Fill in the Blanks', defaultMarks: 1 },
-                { id: 'Short', label: 'Short Answer', defaultMarks: 3 },
-                { id: 'Long', label: 'Long Answer', defaultMarks: 5 },
-                { id: 'Match', label: 'Matching', defaultMarks: 4 },
-                { id: 'Case', label: 'Case Study', defaultMarks: 5 }
-            ];
-
-            // --- CORE FUNCTIONS ---
-
-            /**
-             * Validates all required fields in a given step.
-             * @param {number} stepIndex - The index of the step to validate.
-             * @returns {boolean} - True if the step is valid, false otherwise.
-             */
-            const validateStep = (stepIndex) => {
-                const currentStepDiv = steps[stepIndex];
-                const inputs = currentStepDiv.querySelectorAll('input[required], select[required]');
-                let isValid = true;
-                inputs.forEach(input => {
-                    if (!input.value || input.value === "") {
-                        isValid = false;
-                        input.classList.add('is-invalid');
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
-                });
-                return isValid;
-            };
-
-            /**
-             * Updates the progress bar based on the current step.
-             */
-            const updateProgressBar = () => {
-                const progress = (currentStep / (steps.length - 1)) * 100;
-                progressBar.style.width = `${progress}%`;
-            };
-
-            /**
-             * Shows a specific step in the form.
-             * @param {number} stepIndex - The index of the step to show.
-             */
-            const showStep = (stepIndex) => {
-                if (stepIndex > currentStep && !validateStep(currentStep)) {
-                    return; 
-                }
-                steps.forEach((step, index) => {
-                    step.classList.toggle('active', index === stepIndex);
-                });
-                currentStep = stepIndex;
-                updateProgressBar();
-            };
-
-            /**
-             * Updates the summary panel with the latest form data.
-             */
-            const updateSummary = () => {
-                const summaryFields = {
-                    school: document.getElementById('summarySchool'),
-                    board: document.getElementById('summaryBoard'),
-                    class: document.getElementById('summaryClass'),
-                    subject: document.getElementById('summarySubject'),
-                    totalQuestions: document.getElementById('summaryTotalQuestions'),
-                    totalMarks: document.getElementById('summaryTotalMarks')
-                };
-                
-                summaryFields.school.textContent = document.getElementById('schoolName').value || '...';
-                summaryFields.board.textContent = document.getElementById('schoolBoard').value || '...';
-                summaryFields.class.textContent = document.getElementById('classSelect').value || '...';
-                const subjectSelect = document.getElementById('subjectSelect');
-                summaryFields.subject.textContent = subjectSelect.options[subjectSelect.selectedIndex]?.text || '...';
-                
-                let totalQuestions = 0, totalMarks = 0;
-                document.querySelectorAll('.question-type-group').forEach(group => {
-                    const count = parseInt(group.querySelector('.question-count').value) || 0;
-                    const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
-                    totalQuestions += count;
-                    totalMarks += count * marks;
-                });
-                summaryFields.totalQuestions.textContent = totalQuestions;
-                summaryFields.totalMarks.textContent = totalMarks;
-            };
-
-            // --- EVENT LISTENERS ---
-
-            // Use event delegation for next/prev buttons
-            form.addEventListener('click', (e) => {
-                if (e.target.matches('.next-step')) {
-                    if (currentStep < steps.length - 1) showStep(currentStep + 1);
-                }
-                if (e.target.matches('.prev-step')) {
-                    if (currentStep > 0) showStep(currentStep - 1);
-                }
-            });
-
-            // Remove invalid status on input
-            form.addEventListener('input', (e) => {
-                if (e.target.matches('input[required], select[required]')) {
-                    if (e.target.value && e.target.value !== "") {
-                        e.target.classList.remove('is-invalid');
-                    }
-                }
-                // Update summary on any form input
-                updateSummary();
-            });
-
-            // Handle dynamic subjects based on class selection
-            const classSelect = document.getElementById('classSelect');
-            classSelect.addEventListener('change', () => {
-                const subjectSelect = document.getElementById('subjectSelect');
-                const selectedClass = parseInt(classSelect.value);
-                const subjectList = (selectedClass >= 1 && selectedClass <= 10) ? subjects.junior : subjects.senior;
-                subjectSelect.innerHTML = '<option selected disabled value="">Choose...</option>';
-                subjectList.forEach(subject => {
-                    const option = new Option(subject, subject.toLowerCase().replace(/ /g, '_'));
-                    subjectSelect.add(option);
-                });
-                subjectSelect.disabled = false;
-            });
-
-            // Handle form submission
-            form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const payload = {
-        schoolName: document.getElementById('schoolName').value.trim(),
-        schoolBoard: document.getElementById('schoolBoard').value,
-        class: document.getElementById('classSelect').value,
-        subject: document.getElementById('subjectSelect').options[document.getElementById('subjectSelect').selectedIndex].text,
-        questionDistribution: {},
-        difficultyDistribution: {}
-    };
-
-    document.querySelectorAll('.question-type-group').forEach(group => {
-        const label = group.querySelector('.form-label.fw-bold').textContent.trim();
-        const count = parseInt(group.querySelector('.question-count').value || '0', 10);
-        const marks = parseInt(group.querySelector('.marks-per-question').value || '1', 10);
-        if (count > 0) {
-            payload.questionDistribution[label] = { count, marks };
-        }
-    });
-
-    const easy = parseInt(document.getElementById('easyValue').textContent.replace('%',''), 10);
-    const medium = parseInt(document.getElementById('mediumValue').textContent.replace('%',''), 10);
-    const hard = parseInt(document.getElementById('hardValue').textContent.replace('%',''), 10);
-    payload.difficultyDistribution = { Easy: easy, Medium: medium, Hard: hard };
-
-    try {
-        const res = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) throw new Error('API error ' + res.status);
-        const data = await res.json();
-        renderGeneratedPaper(data);
-    } catch (err) {
-        alert('Error: ' + err.message);
+  <style>
+    /* --- Color variables & themes --- */
+    :root{
+      --primary-color:#00796b;
+      --accent-color:#ffab40;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --text:#334155;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow: rgba(100,116,139,0.12);
+      --easy:#22c55e;
+      --med:#3b82f6;
+      --hard:#ef4444;
     }
-});
 
-function renderGeneratedPaper(data) {
-    let container = document.getElementById('generatedPaper');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'generatedPaper';
-        container.className = 'container my-4';
-        document.body.appendChild(container);
+    [data-bs-theme="dark"]{
+      --primary-color:#26a69a;
+      --accent-color:#ffd180;
+      --bg:#0f172a;
+      --card:#1e293b;
+      --text:#cbd5e1;
+      --muted:#94a3b8;
+      --border:#334155;
+      --shadow: rgba(0,0,0,0.2);
+      --easy:#4ade80;
+      --med:#60a5fa;
+      --hard:#f87171;
     }
-    const { summary, questions } = data || {};
-    container.innerHTML = `
-        <h3>Generated Paper</h3>
-        <p><strong>Total Questions:</strong> ${summary?.total_questions || 0}</p>
-        <p><strong>Total Marks:</strong> ${summary?.total_marks || 0}</p>
-        <ol>
-            ${(questions || []).map(q => `<li>${q.type} (${q.marks} marks) [${q.difficulty}] - ${q.question}</li>`).join('')}
-        </ol>
-    `;
+
+    html,body{ height:100%; background:var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+
+    /* Cards & layout */
+    .main-card, .summary-card { background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 6px 16px -8px var(--shadow), 0 6px 12px -12px var(--shadow); }
+    .card-header { background:transparent; border-bottom:1px solid var(--border); padding:1rem 1.25rem; }
+    .card-body { padding:1.5rem; }
+
+    /* Form steps */
+    .form-step { display:none; animation:fadeIn .25s ease-out; }
+    .form-step.active { display:block; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
+
+    .form-label { font-weight:600; color:var(--muted); font-size:0.95rem; }
+    .form-control, .form-select { border-radius:8px; background:transparent; border:1px solid var(--border); padding:10px 12px; font-weight:600; color:var(--text); }
+    .form-control::placeholder { color: var(--muted); font-weight:500; }
+
+    .btn { border-radius:10px; font-weight:700; }
+    .btn-primary { background:var(--primary-color); border:none; color:#fff; }
+    .btn-outline-secondary { border-radius:10px; }
+
+    .progress { height:10px; border-radius:6px; background:var(--border); }
+    .progress-bar { background:var(--accent-color); transition:width .35s ease-in-out; }
+
+    /* Distribution bar */
+    .distribution-bar { position:relative; width:100%; height:20px; background:var(--border); border-radius:10px; display:flex; overflow:hidden; }
+    .dist-segment { height:100%; transition:width .12s linear; }
+    .dist-segment.easy { background:var(--easy); border-radius:10px 0 0 10px; }
+    .dist-segment.medium { background:var(--med); }
+    .dist-segment.hard { background:var(--hard); border-radius:0 10px 10px 0; }
+    .dist-handle { position:absolute; top:50%; transform:translate(-50%,-50%); width:24px; height:24px; border-radius:50%; background:var(--card); border:3px solid var(--primary-color); cursor:ew-resize; z-index:10; }
+    .dist-labels { display:flex; justify-content:space-between; margin-top:8px; }
+    .badge { font-weight:700; }
+
+    .question-type-group { padding:12px; border-radius:8px; border:1px solid var(--border); background:transparent; }
+
+    /* Chapters container */
+    #chaptersContainer { max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--card); }
+
+    /* Template cards (offcanvas) */
+    .template-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+    .template-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; min-height:120px; }
+
+    /* Preview style */
+    .preview-card { border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:0 6px 16px -8px var(--shadow); margin-top:1rem; }
+
+    /* Saved Templates button (moved to top-left) */
+    #openTemplatesBtn { position:fixed; top:20px; left:20px; z-index:1080; border-radius:8px; padding:.5rem .9rem; font-weight:700; }
+    #openPapersBtn{
+  position:fixed;
+  top:70px;          /* sits just below Saved Templates */
+  left:20px;
+  z-index:1080;
+  border-radius:8px;
+  padding:.5rem .9rem;
+  font-weight:700;
 }
 
 
-            // Theme toggle
-            themeToggle.addEventListener('change', () => {
-                document.documentElement.setAttribute('data-bs-theme', themeToggle.checked ? 'dark' : 'light');
-            });
+    /* Small summary styles */
+    .summary-value { font-weight:700; color:var(--text); }
 
-            // --- INITIALIZATION ---
+    /* --- Dark Mode fixes (override Bootstrap defaults) --- */
+    [data-bs-theme="dark"] .main-card,
+    [data-bs-theme="dark"] .summary-card,
+    [data-bs-theme="dark"] .template-card,
+    [data-bs-theme="dark"] .preview-card {
+      background-color: var(--card) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
 
-            // Dynamically populate class dropdown
-            for (let i = 1; i <= 12; i++) {
-                classSelect.add(new Option(i, i));
-            }
+    [data-bs-theme="dark"] .list-group-item {
+      background-color: var(--card) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
 
-            // Dynamically create question type inputs
-            const questionContainer = document.getElementById('question-distribution-container');
-            questionContainer.innerHTML = questionTypes.map(q => `
-                <div class="col-md-6 question-type-group">
-                    <label class="form-label fw-bold">${q.label}</label>
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="input-group">
-                                <span class="input-group-text">#</span>
-                                <input type="number" class="form-control question-count" id="num${q.id}" value="0" min="0" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="input-group">
-                                <span class="input-group-text">Marks</span>
-                                <input type="number" class="form-control marks-per-question" id="marks${q.id}" value="${q.defaultMarks}" min="1" required>
-                            </div>
-                        </div>
-                    </div>
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select {
+      background-color: var(--bg) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    [data-bs-theme="dark"] #chaptersContainer {
+      background-color: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+
+    [data-bs-theme="dark"] .btn-outline-secondary {
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    /* Responsive nicety */
+    @media (max-width: 767px) {
+      .summary-card { position: static; margin-top:1rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme toggle -->
+  <div class="form-check form-switch position-fixed top-0 end-0 m-3 p-3" style="z-index:1050;">
+    <input id="themeToggle" class="form-check-input" type="checkbox" role="switch" />
+    <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars-fill"></i></label>
+  </div>
+
+  <div class="container my-5">
+    <div class="text-center mb-4">
+      <h1 class="display-5 fw-bold">Intelligent Paper Generator</h1>
+      <p class="lead" style="color:var(--muted)">Build assessments quickly.</p>
+    </div>
+
+    <div class="row g-5">
+      <!-- Left: form -->
+      <div class="col-lg-8">
+        <div class="main-card">
+          <div class="card-header">
+            <div class="progress"><div id="progressBar" class="progress-bar" role="progressbar" style="width:0%"></div></div>
+          </div>
+
+          <div class="card-body">
+            <form id="paperForm" novalidate>
+              <!-- STEP 1 -->
+              <div class="form-step active" id="step-1">
+                <h4 class="mb-4 fw-bold">Step 1: Core Details</h4>
+                <div class="col-12">
+                <label for="examName" class="form-label">Examination Name</label>
+                <input id="examName" class="form-control" placeholder="e.g., Mid-Term Examination" required>
                 </div>
-            `).join('');
 
-            // Initialize the first step and summary
-            showStep(0);
-            updateSummary();
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label for="schoolName" class="form-label">School Name</label>
+                    <input id="schoolName" class="form-control" placeholder="e.g., Delhi Public School" required>
+                  </div>
 
-            // --- DISTRIBUTION BAR LOGIC ---
-            const distBar = document.getElementById('distributionBar');
-            const handle1 = document.getElementById('handle1');
-            const handle2 = document.getElementById('handle2');
-            const easySegment = document.getElementById('easySegment');
-            const mediumSegment = document.getElementById('mediumSegment');
-            const hardSegment = document.getElementById('hardSegment');
-            const easyValue = document.getElementById('easyValue');
-            const mediumValue = document.getElementById('mediumValue');
-            const hardValue = document.getElementById('hardValue');
+                  <div class="col-md-6">
+                    <label for="schoolBoard" class="form-label">School Board</label>
+                    <select id="schoolBoard" class="form-select" required>
+                      <option selected disabled value="">Choose...</option>
+                      <option value="CBSE">CBSE</option>
+                      <option value="ICSE">ICSE</option>
+                      <option value="State Board">State Board</option>
+                    </select>
+                  </div>
 
-            function updateDistribution() {
-                const p1 = parseFloat(handle1.style.left);
-                const p2 = parseFloat(handle2.style.left);
-                
-                const easyPercent = Math.round(p1);
-                const mediumPercent = Math.round(p2 - p1);
-                const hardPercent = 100 - easyPercent - mediumPercent;
+                  <div class="col-md-6">
+                    <label for="classSelect" class="form-label">Class</label>
+                    <select id="classSelect" class="form-select" required>
+                      <option selected disabled value="">Choose...</option>
+                    </select>
+                  </div>
 
-                easySegment.style.width = `${easyPercent}%`;
-                mediumSegment.style.width = `${mediumPercent}%`;
-                hardSegment.style.width = `${hardPercent}%`;
+                  <div class="col-12">
+                    <label for="subjectSelect" class="form-label">Subject</label>
+                    <select id="subjectSelect" class="form-select" required disabled>
+                      <option selected disabled value="">Waiting for class...</option>
+                    </select>
+                  </div>
 
-                easyValue.textContent = `${easyPercent}%`;
-                mediumValue.textContent = `${mediumPercent}%`;
-                hardValue.textContent = `${hardPercent}%`;
-            }
+                  <div class="col-12">
+                    <label class="form-label">Select Chapters</label>
+                    <div class="mb-2 d-flex gap-2">
+                      <button type="button" id="selectAllChapters" class="btn btn-sm btn-outline-primary" disabled><i class="bi bi-check2-square me-1"></i>Select All</button>
+                      <button type="button" id="deselectAllChapters" class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-x-square me-1"></i>Deselect All</button>
+                    </div>
+                    <div id="chaptersContainer">
+                      <small class="text-muted">Select board & subject to view chapters</small>
+                    </div>
+                  </div>
+                </div>
 
-            function makeDraggable(handle) {
-                let isDragging = false;
-                handle.addEventListener('mousedown', () => { isDragging = true; document.body.style.cursor = 'ew-resize'; });
-                document.addEventListener('mouseup', () => { isDragging = false; document.body.style.cursor = 'auto'; });
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    const rect = distBar.getBoundingClientRect();
-                    let percent = ((e.clientX - rect.left) / rect.width) * 100;
-                    percent = Math.max(0, Math.min(100, percent));
-                    
-                    if (handle === handle1) {
-                        percent = Math.min(percent, parseFloat(handle2.style.left));
-                    } else {
-                        percent = Math.max(percent, parseFloat(handle1.style.left));
-                    }
-                    
-                    handle.style.left = `${percent}%`;
-                    updateDistribution();
-                });
-            }
+                <div class="d-flex justify-content-end mt-4">
+                  <button type="button" class="btn btn-primary next-btn">Next <i class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+              </div>
 
-            makeDraggable(handle1);
-            makeDraggable(handle2);
-            updateDistribution();
+              <!-- STEP 2 -->
+              <div class="form-step" id="step-2">
+                <h4 class="mb-4 fw-bold">Step 2: Question & Marks Distribution</h4>
+                <div class="row g-3" id="questionTypesContainer"></div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i>Previous</button>
+                  <button type="button" class="btn btn-primary next-btn">Next <i class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+              </div>
+
+              <!-- STEP 3 (final) -->
+              <div class="form-step" id="step-3">
+                <h4 class="mb-4 fw-bold">Step 3: Difficulty Distribution & Generate</h4>
+
+                <div class="distribution-bar-container">
+                  <div class="dist-labels">
+                    <div class="dist-label text-success">Easy: <span class="badge text-bg-success" id="easyValue">40%</span></div>
+                    <div class="dist-label text-primary">Medium: <span class="badge text-bg-primary" id="mediumValue">40%</span></div>
+                    <div class="dist-label text-danger">Hard: <span class="badge text-bg-danger" id="hardValue">20%</span></div>
+                  </div>
+
+                  <div class="distribution-bar mt-2" id="distributionBar">
+                    <div class="dist-segment easy" id="easySegment"></div>
+                    <div class="dist-segment medium" id="mediumSegment"></div>
+                    <div class="dist-segment hard" id="hardSegment"></div>
+                    <div class="dist-handle" id="handle1" style="left:40%"></div>
+                    <div class="dist-handle" id="handle2" style="left:80%"></div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i>Previous</button>
+                  <!-- Generate paper button in step 3 -->
+                  <button type="button" id="generatePaperBtn" class="btn btn-success"><i class="bi bi-stars me-1"></i>Generate Paper (Preview)</button>
+                </div>
+
+                <!-- Generated preview appears only here (inside Step 3) -->
+                <div id="generatedPaperContainer" class="mt-4"></div>
+              </div>
+
+              <!-- removed old STEP 4 and STEP 5 -->
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Live summary -->
+      <div class="col-lg-4">
+        <div class="summary-card p-4">
+          <div class="card-header" style="background:transparent;border:none;text-align:center;font-weight:700">Live Preview</div>
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+           <span><i class="bi bi-pencil-square me-2"></i>Examination</span><span id="miniExam">...</span>
+           </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-building me-2"></i>School</span><span id="miniSchool">...</span></li>
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-journal-check me-2"></i>Board</span><span id="miniBoard">...</span></li>
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-person-video2 me-2"></i>Class</span><span id="miniClass">...</span></li>
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-book-half me-2"></i>Subject</span><span id="miniSubject">...</span></li>
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-list-check me-2"></i>Chapters</span><span id="miniChapters">...</span></li>
+            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-question-circle me-2"></i>Questions</span><span id="miniQuestions">0</span></li>
+            <li class="list-group-item text-center"><div style="color:var(--muted)">Total Marks</div><div id="miniMarks" style="font-size:1.4rem;color:var(--primary-color);font-weight:700">0</div></li>
+          </ul>
+
+          <div class="d-grid">
+            <button id="saveQuickBtn" class="btn btn-outline-primary"><i class="bi bi-save me-2"></i>Save as Template</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- removed the global generatedPaperContainer (preview only inside step 3) -->
+  </div>
+
+  <!-- Top-left Saved Templates button (replaces floating bottom-right) -->
+  <button id="openTemplatesBtn" class="btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas" aria-controls="templatesOffcanvas" title="Saved Templates">
+    <i class="bi bi-collection me-1"></i> Saved Templates
+  </button>
+  <button id="openPapersBtn" class="btn btn-outline-success"
+        data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
+        aria-controls="papersOffcanvas" title="Generated Papers">
+  <i class="bi bi-journals me-1"></i> Generated Papers
+</button>
+
+
+  <!-- Offcanvas Sidebar for Saved Templates (left) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="templatesOffcanvas" aria-labelledby="templatesOffcanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="templatesOffcanvasLabel">Saved Templates</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <small class="text-muted">Templates stored locally in your browser</small>
+        <button id="clearAllTemplates" class="btn btn-sm btn-outline-danger">Clear All</button>
+      </div>
+      <div id="savedTemplatesGrid" class="template-grid"></div>
+    </div>
+  </div>
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="papersOffcanvas" aria-labelledby="papersOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="papersOffcanvasLabel">Generated Papers</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <small class="text-muted">Your past generated papers (saved locally)</small>
+      <button id="clearAllPapers" class="btn btn-sm btn-outline-danger">Clear All</button>
+    </div>
+    <div id="generatedPapersGrid" class="template-grid"></div>
+  </div>
+</div>
+
+
+  <script>
+  /* ===================== Data ===================== */
+  const subjects = {
+    CBSE: {
+      1: ['English','Hindi','Mathematics','EVS'],
+      2: ['English','Hindi','Mathematics','EVS'],
+      3: ['English','Hindi','Mathematics','Science'],
+      4: ['English','Hindi','Mathematics','Science'],
+      5: ['English','Hindi','Mathematics','Science'],
+      6: ['English','Hindi','Mathematics','Science','Social Science'],
+      7: ['English','Hindi','Mathematics','Science','Social Science'],
+      8: ['English','Hindi','Mathematics','Science','Social Science'],
+      9: ['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
+      10:['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
+      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
+      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
+    },
+    ICSE: {
+      1: ['English','Environmental Studies'],
+      2: ['English','Environmental Studies'],
+      3: ['English','Mathematics','Environmental Studies'],
+      4: ['English','Mathematics','Environmental Studies'],
+      5: ['English','Mathematics','Environmental Studies'],
+      6: ['English','Mathematics','Science','Social Science'],
+      7: ['English','Mathematics','Science','Social Science'],
+      8: ['English','Mathematics','Science','Social Science'],
+      9: ['Mathematics','English','Physics','Chemistry','Biology','History & Civics'],
+      10:['Mathematics','English','Physics','Chemistry','Biology','History & Civics','Geography','Computer','English Grammar'],
+      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
+      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
+    },
+    "State Board": {
+      1: ['English','Regional Language'],
+      2: ['English','Regional Language'],
+      3: ['English','Mathematics','Science'],
+      4: ['English','Mathematics','Science'],
+      5: ['English','Mathematics','Science'],
+      6: ['English','Mathematics','Science'],
+      7: ['English','Mathematics','Science'],
+      8: ['English','Mathematics','Science'],
+      9: ['Mathematics','Science','English'],
+      10:['Mathematics','Science','English'],
+      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
+      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
+    }
+  };
+
+  /* Expanded chapters (realistic sample — extend as desired) */
+ /* ======= Full Class 10 Chapters (CBSE, ICSE, State Board uses NCERT reference) ======= */
+const class10Chapters = {
+  CBSE: {
+    Mathematics: [
+      "Real Numbers",
+      "Polynomials",
+      "Pair of Linear Equations in Two Variables",
+      "Quadratic Equations",
+      "Arithmetic Progressions",
+      "Triangles",
+      "Coordinate Geometry",
+      "Introduction to Trigonometry",
+      "Applications of Trigonometry",
+      "Circles",
+      "Constructions",
+      "Areas Related to Circles",
+      "Surface Areas and Volumes",
+      "Statistics",
+      "Probability"
+    ],
+    Science: [
+      "Chemical Reactions and Equations",
+      "Acids, Bases and Salts",
+      "Metals and Non-metals",
+      "Carbon and its Compounds",
+      "Periodic Classification of Elements",
+      "Life Processes",
+      "Control and Coordination",
+      "How do Organisms Reproduce?",
+      "Heredity and Evolution",
+      "Light – Reflection and Refraction",
+      "The Human Eye and the Colourful World",
+      "Electricity",
+      "Magnetic Effects of Electric Current",
+      "Sources of Energy",
+      "Our Environment",
+      "Sustainable Management of Natural Resources"
+    ],
+    English: [
+      "First Flight (Prose) – A Letter to God, Nelson Mandela, Two Stories About Flying, From the Diary of Anne Frank, Glimpses of India, Mijbil the Otter, Madam Rides the Bus, The Sermon at Benares, The Proposal",
+      "First Flight (Poetry) – Dust of Snow, Fire and Ice, A Tiger in the Zoo, How to Tell Wild Animals, The Ball Poem, Amanda!, Animals, The Trees, Fog, The Tale of Custard the Dragon, For Anne Gregory",
+      "Footprints Without Feet – A Triumph of Surgery, The Thief’s Story, The Midnight Visitor, A Question of Trust, Footprints Without Feet, The Making of a Scientist, The Necklace, The Hack Driver, Bholi, The Book That Saved the Earth",
+      "Grammar – Tenses, Modals, Subject-Verb Agreement, Reported Speech, Clauses",
+      "Writing – Letter Writing, Article, Report, Analytical Paragraph"
+    ],
+    Hindi: [
+      "क्षितिज भाग 2 – पद्य खंड (चयनित कविताएँ), गद्य खंड (कहानियाँ और निबंध)",
+      "कृतिका भाग 2 – (चयनित अध्याय)",
+      "व्याकरण – संधि, समास, अलंकार, वाक्य परिवर्तन",
+      "लेखन कौशल – पत्र, निबंध, संवाद लेखन"
+    ],
+    "Social Science": [
+      "History – The Rise of Nationalism in Europe, Nationalism in India, The Making of a Global World, The Age of Industrialisation, Print Culture and the Modern World",
+      "Geography – Resources and Development, Forest and Wildlife Resources, Water Resources, Agriculture, Minerals and Energy Resources, Manufacturing Industries, Lifelines of National Economy",
+      "Political Science – Power Sharing, Federalism, Democracy and Diversity, Gender, Religion and Caste, Popular Struggles and Movements, Political Parties, Outcomes of Democracy, Challenges to Democracy",
+      "Economics – Development, Sectors of the Indian Economy, Money and Credit, Globalisation and the Indian Economy, Consumer Rights"
+    ],
+    "Computer Science": [
+      "Basics of Python Programming",
+      "Control Structures (Loops, Conditionals)",
+      "Functions and Modules",
+      "File Handling",
+      "Database Management (Introduction to SQL)",
+      "Internet and Networking Basics",
+      "Project Work"
+    ]
+  },
+
+  ICSE: {
+    Mathematics: [
+      "Commercial Mathematics – Shares and Dividends",
+      "Algebra – Factorisation, Quadratic Equations, Matrices, Arithmetic and Geometric Progressions",
+      "Geometry – Similarity, Circles",
+      "Mensuration – Areas and Volumes",
+      "Trigonometry – Identities, Heights and Distances",
+      "Statistics – Mean, Median, Mode",
+      "Probability – Basic Theorems",
+      "Coordinate Geometry – Distance, Section Formula, Equation of Line"
+    ],
+    English: [
+      "Prose (from Treasure Trove – A Collection of ICSE Poems and Short Stories)",
+      "Poetry (Selected Poems from Treasure Trove)",
+      "Drama – Shakespeare (The Merchant of Venice)",
+      "Grammar – Transformation of Sentences, Synthesis, Prepositions, Reported Speech",
+      "Composition and Precis Writing"
+    ],
+    Physics: [
+      "Force, Work, Energy and Power",
+      "Light – Reflection, Refraction, Lenses",
+      "Sound",
+      "Electricity and Magnetism",
+      "Heat",
+      "Modern Physics – Radioactivity"
+    ],
+    Chemistry: [
+      "Periodic Table",
+      "Chemical Bonding",
+      "Mole Concept and Stoichiometry",
+      "Metallurgy",
+      "Organic Chemistry",
+      "Acids, Bases and Salts",
+      "Analytical Chemistry",
+      "Study of Compounds – Hydrogen Chloride, Ammonia, Nitric Acid, Sulphuric Acid"
+    ],
+    Biology: [
+      "Cell – The Structure and Functions",
+      "Genetics and Evolution",
+      "Plant Physiology",
+      "Human Anatomy and Physiology",
+      "Pollution and Environment",
+      "Basic Biotechnology"
+    ],
+    "History & Civics": [
+      "The Union Legislature",
+      "The Union Executive",
+      "The Judiciary",
+      "The Indian National Movement (1915–1947)",
+      "Contemporary World History – The World Wars, United Nations, Non-Aligned Movement"
+    ],
+    "Geography": [
+      "Climate of India",
+      "Soils in India",
+      "Natural Vegetation of India",
+      "Water Resources",
+      "Agriculture in India",
+      "Industries in India",
+      "Transport in India",
+      "Waste Management"
+    ]
+  },
+
+  /* State Board = NCERT reference (same as CBSE) */
+  "State Board": {}
+};
+
+// Copy CBSE chapters into State Board automatically
+class10Chapters["State Board"] = JSON.parse(JSON.stringify(class10Chapters["CBSE"]));
+
+  const questionTypes = [
+    { id: 'MCQ', label: 'Multiple Choice', defaultMarks: 1 },
+    { id: 'Fill', label: 'Fill in the Blanks', defaultMarks: 1 },
+    { id: 'Short', label: 'Short Answer', defaultMarks: 3 },
+    { id: 'Long', label: 'Long Answer', defaultMarks: 5 },
+    { id: 'Match', label: 'Matching', defaultMarks: 4 },
+    { id: 'Case', label: 'Case Study', defaultMarks: 5 }
+  ];
+
+  /* ===================== DOM refs ===================== */
+  const paperForm = document.getElementById('paperForm');
+  const steps = Array.from(document.querySelectorAll('.form-step'));
+  const progressBar = document.getElementById('progressBar');
+
+  const examNameEl = document.getElementById('examName');
+ const miniExam = document.getElementById('miniExam');
+  const schoolNameEl = document.getElementById('schoolName');
+  const boardEl = document.getElementById('schoolBoard');
+  const classEl = document.getElementById('classSelect');
+  const subjectEl = document.getElementById('subjectSelect');
+  const chaptersContainer = document.getElementById('chaptersContainer');
+  const selectAllChaptersBtn = document.getElementById('selectAllChapters');
+  const deselectAllChaptersBtn = document.getElementById('deselectAllChapters');
+
+  const qTypesContainer = document.getElementById('questionTypesContainer');
+
+  const easySeg = document.getElementById('easySegment');
+  const medSeg = document.getElementById('mediumSegment');
+  const hardSeg = document.getElementById('hardSegment');
+  const distBar = document.getElementById('distributionBar');
+  const handle1 = document.getElementById('handle1');
+  const handle2 = document.getElementById('handle2');
+  const easyValueEl = document.getElementById('easyValue');
+  const medValueEl = document.getElementById('mediumValue');
+  const hardValueEl = document.getElementById('hardValue');
+
+  const miniSchool = document.getElementById('miniSchool');
+  const miniBoard = document.getElementById('miniBoard');
+  const miniClass = document.getElementById('miniClass');
+  const miniSubject = document.getElementById('miniSubject');
+  const miniChapters = document.getElementById('miniChapters');
+  const miniQuestions = document.getElementById('miniQuestions');
+  const miniMarks = document.getElementById('miniMarks');
+
+  const saveQuickBtn = document.getElementById('saveQuickBtn');
+  const savedTemplatesGrid = document.getElementById('savedTemplatesGrid');
+  const openPapersBtn = document.getElementById('openPapersBtn');
+const clearAllPapersBtn = document.getElementById('clearAllPapers');
+const generatedPapersGrid = document.getElementById('generatedPapersGrid');
+
+
+  const themeToggle = document.getElementById('themeToggle');
+  const generatePaperBtn = document.getElementById('generatePaperBtn');
+  const openTemplatesBtn = document.getElementById('openTemplatesBtn');
+  const clearAllTemplatesBtn = document.getElementById('clearAllTemplates');
+
+  let currentStep = 0;
+
+  /* ===================== Init ===================== */
+  document.addEventListener('DOMContentLoaded', () => {
+    // populate class 1..12
+    for (let i=1;i<=12;i++) classEl.add(new Option(i, i));
+
+    // create question groups
+    qTypesContainer.innerHTML = questionTypes.map(q => `
+      <div class="col-md-6 question-type-group">
+        <label class="form-label fw-bold">${q.label}</label>
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="input-group">
+              <span class="input-group-text">#</span>
+              <input type="number" class="form-control question-count" id="num${q.id}" value="0" min="0" required>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="input-group">
+              <span class="input-group-text">Marks</span>
+              <input type="number" class="form-control marks-per-question" id="marks${q.id}" value="${q.defaultMarks}" min="1" required>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    attachHandlers();
+    showStep(0);
+
+    // restore theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-bs-theme','dark');
+      themeToggle.checked = true;
+    } else {
+      document.documentElement.setAttribute('data-bs-theme','light');
+      themeToggle.checked = false;
+    }
+
+    updateSummary();
+    updateDistribution();
+    renderTemplates(); // render templates in offcanvas
+    renderGeneratedPapers();
+
+  });
+
+  /* ===================== Handlers ===================== */
+  function attachHandlers(){
+    // theme toggle
+    themeToggle.addEventListener('change', () => {
+      const theme = themeToggle.checked ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+      localStorage.setItem('theme', theme);
+    });
+
+    // step navigation (delegated)
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.next-btn')) {
+        if (currentStep < steps.length-1) showStep(currentStep+1);
+      }
+      if (e.target.closest('.prev-btn')) {
+        if (currentStep > 0) showStep(currentStep-1);
+      }
+    });
+
+    // clear all templates
+    clearAllTemplatesBtn?.addEventListener('click', () => {
+      if (!confirm('Clear all saved templates?')) return;
+      localStorage.removeItem('qp_templates');
+      renderTemplates();
+    });
+
+    // board -> populate subjects when class selected
+    boardEl.addEventListener('change', () => {
+      // clear subject and chapters
+      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
+      subjectEl.disabled = true;
+      clearChapters();
+      updateSummary();
+    });
+
+    classEl.addEventListener('change', () => {
+      const board = boardEl.value;
+      const cls = parseInt(classEl.value,10);
+      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
+      subjectEl.disabled = false;
+      const list = (subjects[board] && subjects[board][cls]) ? subjects[board][cls] : [];
+      list.forEach(s => subjectEl.add(new Option(s, s)));
+      clearChapters();
+      updateSummary();
+    });
+
+    subjectEl.addEventListener('change', () => {
+      populateChapters();
+      updateSummary();
+    });
+
+    // select/deselect chapters
+    selectAllChaptersBtn.addEventListener('click', () => {
+      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = true);
+      updateSummary();
+    });
+    deselectAllChaptersBtn.addEventListener('click', () => {
+      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = false);
+      updateSummary();
+    });
+
+    // save templates
+    saveQuickBtn.addEventListener('click', saveTemplate);
+
+
+// generate preview button (only in Step 3)
+generatePaperBtn.addEventListener('click', async () => {
+  // ... (unchanged validation code) ...
+  const payload = buildPayload();
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    // Defensive fallbacks if backend keys differ
+    const questions = Array.isArray(data.questions) ? data.questions : [];
+    const totalQ = data.summary?.total_questions ?? questions.length ?? 0;
+    const totalM = data.summary?.total_marks ?? 0;
+    const pdfUrl    = data.pdf_url    || '#';
+    const wordUrl   = data.word_url   || '#';
+    const answerUrl = data.answer_key_url || '#';
+    const container = document.getElementById('generatedPaperContainer');
+    container.innerHTML = `
+      <div class="preview-card">
+        <h5 class="mb-3">Generated Paper</h5>
+        <p><strong>Total Questions:</strong> ${totalQ}</p>
+        <p><strong>Total Marks:</strong> ${totalM}</p>
+        <ol>
+          ${questions.map(q => `<li>${q.type || q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
+        </ol>
+        <div class="d-flex gap-2 mt-3">
+          <a href="${pdfUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+          </a>
+          <a href="${wordUrl}" target="_blank" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-file-earmark-word me-1"></i>Download Word
+          </a>
+          <a href="${answerUrl}" target="_blank" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-journal-text me-1"></i>Download Answer Key
+          </a>
+        </div>
+      </div>
+    `;
+    // Update live preview numbers (right panel) after paper generation
+    // miniQuestions.textContent = totalQ;
+    // miniMarks.textContent = totalM;
+    // Scroll to preview
+    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (err) {
+    console.error(err);
+    alert('Failed to generate paper from backend. Check server logs.');
+  }
+});
+
+
+
+    // Show backend-generated paper
+    const container = document.getElementById('generatedPaperContainer');
+    container.innerHTML = `
+      <div class="preview-card">
+        <h5 class="mb-3">Generated Paper</h5>
+        <p><strong>Total Questions:</strong> ${data.summary.total_questions}</p>
+        <p><strong>Total Marks:</strong> ${data.summary.total_marks}</p>
+        <ol>${data.questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
+        <div class="d-flex gap-2 mt-3">
+          <a href="${data.pdf_url}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</a>
+          <a href="${data.word_url}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</a>
+          <a href="${data.answer_key_url}" target="_blank" class="btn btn-outline-success btn-sm"><i class="bi bi-journal-text me-1"></i>Download Answer Key</a>
+        </div>
+      </div>
+    `;
+
+  } 
+
+    // update summary on inputs
+    paperForm.addEventListener('input', (e) => {
+      if (e.target.matches('input[required], select[required]')) {
+        if (e.target.value && e.target.value !== '') e.target.classList.remove('is-invalid');
+      }
+      updateSummary();
+    });
+
+    // chapter checkbox change -> update summary
+    chaptersContainer.addEventListener('change', (e) => {
+      if (e.target.matches('.chapter-checkbox')) updateSummary();
+    });
+
+    // question counts/marks update
+    qTypesContainer.addEventListener('input', updateSummary);
+
+    // make distribution handles draggable
+    makeDraggable(handle1);
+    makeDraggable(handle2);
+    // ensure handles start at 40% and 80%
+    handle1.style.left = '40%'; handle2.style.left = '80%';
+    updateDistribution();
+  
+
+  /* ===================== Steps & Validation ===================== */
+  function validateStep(idx) {
+    const stepEl = steps[idx];
+    const requireds = stepEl.querySelectorAll('input[required], select[required]');
+    let ok = true;
+    requireds.forEach(el => {
+      if (!el.value || el.value === '') {
+        el.classList.add('is-invalid'); ok = false;
+      } else el.classList.remove('is-invalid');
+    });
+    return ok;
+  }
+
+  function showStep(idx) {
+    // if moving forward validate current first
+    if (idx > currentStep && !validateStep(currentStep)) return;
+    steps.forEach((s,i) => s.classList.toggle('active', i === idx));
+    currentStep = idx;
+    const pct = (currentStep / (steps.length - 1)) * 100;
+    progressBar.style.width = pct + '%';
+    updateSummary();
+  }
+
+  /* ===================== Chapters ===================== */
+  function clearChapters(msg = 'Select board & subject to view chapters') {
+    chaptersContainer.innerHTML = `<small class="text-muted">${msg}</small>`;
+    selectAllChaptersBtn.disabled = true;
+    deselectAllChaptersBtn.disabled = true;
+  }
+
+  function populateChapters() {
+    const board = boardEl.value;
+    const subj = subjectEl.value;
+    chaptersContainer.innerHTML = '';
+    selectAllChaptersBtn.disabled = true;
+    deselectAllChaptersBtn.disabled = true;
+    if (!board || !subj) { clearChapters(); return; }
+    
+    const cls = parseInt(classEl.value, 10); // get selected class
+    const chapters = (class10Chapters[board] && class10Chapters[board][subj]) 
+                      ? class10Chapters[board][subj] 
+                      : [];
+    
+    if (!chapters.length) { clearChapters('No chapters available'); return; }
+    
+    chapters.forEach((ch, idx) => {
+      const div = document.createElement('div');
+      div.className = 'form-check';
+      div.innerHTML = `<input class="form-check-input chapter-checkbox" type="checkbox" id="chap-${idx}" value="${ch}">
+                       <label class="form-check-label" for="chap-${idx}">${ch}</label>`;
+      chaptersContainer.appendChild(div);
+    });
+    selectAllChaptersBtn.disabled = false;
+    deselectAllChaptersBtn.disabled = false;
+}
+
+
+ function updateSummary(){
+  const exam = examNameEl.value || '...';
+  const school = schoolNameEl.value || '...';
+  const board = boardEl.value || '...';
+  const cls = classEl.value || '...';
+  const subj = subjectEl.value || '...';
+  const selectedCh = Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value);
+  const qGroups = Array.from(document.querySelectorAll('.question-type-group'));
+  let totalQ = 0, totalMarks = 0;
+  qGroups.forEach(group => {
+    const count = parseInt(group.querySelector('.question-count').value) || 0;
+    const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
+    totalQ += count;
+    totalMarks += count * marks;
+  });
+
+  // mini summary
+  miniSchool.textContent = school;
+  miniExam.textContent = exam;
+  miniBoard.textContent = board;
+  miniClass.textContent = cls;
+  miniSubject.textContent = subj;
+  miniChapters.textContent = selectedCh.join(', ') || '...';
+  miniQuestions.textContent = totalQ;
+  miniMarks.textContent = totalMarks;
+}
+
+  /* ===================== Build payload ===================== */
+  function buildPayload(){
+    const payload = {
+      examName: examNameEl.value.trim(),
+      schoolName: schoolNameEl.value.trim(),
+      schoolBoard: boardEl.value,
+      class: classEl.value,
+      subject: subjectEl.value,
+      chapters: Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value),
+      questionDistribution: {},
+      difficultyDistribution: {}
+    };
+    document.querySelectorAll('.question-type-group').forEach(group => {
+      const label = group.querySelector('.form-label.fw-bold').textContent.trim();
+      const count = parseInt(group.querySelector('.question-count').value || '0',10);
+      const marks = parseInt(group.querySelector('.marks-per-question').value || '1',10);
+      if (count > 0) payload.questionDistribution[label] = { count, marks };
+    });
+
+    // totals
+    const totals = { totalQuestions:0, totalMarks:0 };
+    Object.values(payload.questionDistribution).forEach(q => {
+      totals.totalQuestions += q.count;
+      totals.totalMarks += q.count * q.marks;
+    });
+    payload.questionTotals = totals;
+
+    // difficulty
+    const e = parseInt(easyValueEl.textContent.replace('%','')) || 0;
+    const m = parseInt(medValueEl.textContent.replace('%','')) || 0;
+    const h = parseInt(hardValueEl.textContent.replace('%','')) || 0;
+    payload.difficultyDistribution = { Easy: e, Medium: m, Hard: h };
+
+    return payload;
+  }
+
+  /* ===================== Generated preview (client-side) ===================== */
+  function showGeneratedPreview(payload) {
+    const container = document.getElementById('generatedPaperContainer');
+    const qTotal = payload.questionTotals.totalQuestions || 0;
+    const mTotal = payload.questionTotals.totalMarks || 0;
+    const chapters = (payload.chapters && payload.chapters.length) ? payload.chapters.join(', ') : '—';
+    const html = `
+      <div class="preview-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5 class="mb-0">Generated Paper Preview</h5>
+        </div>
+
+        <div class="mb-3">
+          <div><strong>Examination:</strong> ${payload.examName || '—'}</div>
+          <div><strong>School:</strong> ${payload.schoolName || '—'}</div>
+          <div><strong>Board:</strong> ${payload.schoolBoard || '—'}</div>
+          <div><strong>Class:</strong> ${payload.class || '—'}</div>
+          <div><strong>Subject:</strong> ${payload.subject || '—'}</div>
+          <div><strong>Chapters:</strong> ${chapters}</div>
+          <div class="mt-2"><strong>Questions:</strong> ${qTotal} &nbsp; <strong>Marks:</strong> ${mTotal}</div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button id="downloadPdfBtn" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</button>
+          <button id="downloadWordBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</button>
+          <button id="saveFromPreviewBtn" class="btn btn-primary btn-sm ms-auto"><i class="bi bi-save me-1"></i>Save as Template</button>
+          <button id="downloadAnswerKeyBtn" class="btn btn-outline-success btn-sm">
+  <i class="bi bi-journal-text me-1"></i>Download Answer Key
+</button>
+
+        </div>
+      </div>
+    `;
+    container.innerHTML = html;
+
+// save current preview as template
+document.getElementById('saveFromPreviewBtn').addEventListener('click', () => {
+  saveTemplate(); // reuse saveTemplate to persist current payload
+  renderTemplates();
+  alert('Template saved locally from preview.');
+});
+
+/* ===================== showGenerated (old API fallback) ===================== */
+function showGenerated(data) {
+  const container = document.getElementById('generatedPaperContainer');
+  const summary = data.summary || data || {};
+  const questions = data.questions || [];
+
+  container.innerHTML = `
+    <div class="main-card p-4 my-4">
+      <h4 class="mb-3">Generated Paper</h4>
+      <p><strong>Total Questions:</strong> ${summary.total_questions || summary.totalQuestions || 0}</p>
+      <p><strong>Total Marks:</strong> ${summary.total_marks || summary.totalMarks || 0}</p>
+      <ol class="mt-3">
+        ${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
+      </ol>
+    </div>
+  `;
+}
+
+
+  // build a normalized payload for saving (fallbacks to current form if API omits fields)
+  const paperPayload = {
+    schoolName: summary.schoolName || schoolNameEl.value.trim(),
+    schoolBoard: summary.schoolBoard || boardEl.value,
+    class: summary.class || classEl.value,
+    subject: summary.subject || subjectEl.value,
+    chapters: summary.chapters || Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value),
+    questionTotals: {
+      totalQuestions: summary.total_questions || summary.totalQuestions || questions.length || 0,
+      totalMarks: summary.total_marks || summary.totalMarks || 0
+    },
+    questions
+  };
+
+  saveGeneratedPaper(paperPayload);
+  renderGeneratedPapers();
+
+  container.innerHTML = `
+    <div class="main-card p-4 my-4">
+      <h4 class="mb-3">Generated Paper</h4>
+      <p><strong>Total Questions:</strong> ${paperPayload.questionTotals.totalQuestions}</p>
+      <p><strong>Total Marks:</strong> ${paperPayload.questionTotals.totalMarks}</p>
+      <ol class="mt-3">${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
+    </div>
+  `;
+}
+
+  
+
+  /* ===================== Distribution bar logic ===================== */
+  function updateDistribution(){
+    const p1 = parseFloat(handle1.style.left) || 40;
+    const p2 = parseFloat(handle2.style.left) || 80;
+    const easyPercent = Math.round(p1);
+    const medPercent = Math.round(p2 - p1);
+    const hardPercent = 100 - easyPercent - medPercent;
+    easySeg.style.width = easyPercent + '%';
+    medSeg.style.width = medPercent + '%';
+    hardSeg.style.width = hardPercent + '%';
+    easyValueEl.textContent = easyPercent + '%';
+    medValueEl.textContent = medPercent + '%';
+    hardValueEl.textContent = hardPercent + '%';
+  }
+
+  function makeDraggable(handle){
+    let dragging = false;
+    handle.addEventListener('mousedown', (ev)=> {
+      dragging = true; document.body.style.cursor = 'ew-resize';
+      ev.preventDefault();
+    });
+    document.addEventListener('mouseup', ()=> { dragging = false; document.body.style.cursor = 'default'; });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const rect = document.getElementById('distributionBar').getBoundingClientRect();
+      let percent = ((e.clientX - rect.left) / rect.width) * 100;
+      percent = Math.max(0, Math.min(100, percent));
+      if (handle === handle1) {
+        const rightLimit = parseFloat(handle2.style.left) || 80;
+        percent = Math.min(percent, rightLimit);
+      } else {
+        const leftLimit = parseFloat(handle1.style.left) || 40;
+        percent = Math.max(percent, leftLimit);
+      }
+      handle.style.left = percent + '%';
+      updateDistribution();
+    });
+  }
+
+  /* ===================== Templates (localStorage) ===================== */
+  function saveTemplate(){
+    const payload = buildPayload();
+    const store = JSON.parse(localStorage.getItem('qp_templates') || '[]');
+    const name = (payload.schoolName || 'Template') + ' — ' + (payload.subject || 'Subject') + ' (Class ' + (payload.class || '?') + ')';
+    const tpl = { name, data: payload, createdAt: new Date().toISOString() };
+    store.push(tpl);
+    localStorage.setItem('qp_templates', JSON.stringify(store));
+    renderTemplates();
+  }
+
+  function renderTemplates(){
+    const list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
+    savedTemplatesGrid.innerHTML = '';
+    if (!list.length) {
+      savedTemplatesGrid.innerHTML = '<div class="text-muted">No saved templates</div>';
+      return;
+    }
+    list.forEach((tpl, idx) => {
+      const card = document.createElement('div');
+      card.className = 'template-card';
+      card.innerHTML = `
+        <div>
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h6 class="mb-1" style="font-size:0.95rem;">${tpl.name}</h6>
+              <div class="small text-muted">${new Date(tpl.createdAt).toLocaleString()}</div>
+            </div>
+            <div class="text-end">
+              <div class="small text-muted">Q: ${tpl.data.questionTotals ? tpl.data.questionTotals.totalQuestions : 0}</div>
+              <div class="small text-muted">M: ${tpl.data.questionTotals ? tpl.data.questionTotals.totalMarks : 0}</div>
+            </div>
+          </div>
+          <div class="small mb-2"><strong>Board:</strong> ${tpl.data.schoolBoard} &nbsp; <strong>Class:</strong> ${tpl.data.class}</div>
+          <div class="mb-2"><strong>Subject:</strong> ${tpl.data.subject}</div>
+          <div class="mb-2">${(tpl.data.chapters || []).slice(0,6).map(c => `<span class="badge text-bg-secondary me-1 mb-1">${c}</span>`).join(' ') || '<span class="text-muted">No chapters</span>'}</div>
+        </div>
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn btn-sm btn-primary load-btn" data-idx="${idx}"><i class="bi bi-box-arrow-in-down me-1"></i>Load</button>
+          <button class="btn btn-sm btn-danger del-btn" data-idx="${idx}"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+      `;
+      savedTemplatesGrid.appendChild(card);
+    });
+
+    // attach handlers
+    savedTemplatesGrid.querySelectorAll('.load-btn').forEach(b => b.addEventListener('click', () => {
+      const idx = parseInt(b.dataset.idx,10);
+      const list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
+      applyTemplate(list[idx]);
+      // close offcanvas so user can see the loaded form
+      const offcanvasEl = document.getElementById('templatesOffcanvas');
+      const bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
+      bs.hide();
+      showStep(0);
+      updateSummary();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
+
+    savedTemplatesGrid.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', () => {
+      const idx = parseInt(b.dataset.idx,10);
+      if (!confirm('Delete this template?')) return;
+      let list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
+      list.splice(idx,1);
+      localStorage.setItem('qp_templates', JSON.stringify(list));
+      renderTemplates();
+    }));
+    /* ===================== Generated Papers (localStorage) ===================== */
+function getGeneratedPapers(){
+  return JSON.parse(localStorage.getItem('qp_generated_papers') || '[]');
+}
+function setGeneratedPapers(list){
+  localStorage.setItem('qp_generated_papers', JSON.stringify(list));
+}
+function saveGeneratedPaper(data){
+  const list = getGeneratedPapers();
+  const rec = {
+    id: Date.now() + '-' + Math.random().toString(36).slice(2),
+    name: `${data.subject || 'Subject'} — Class ${data.class || '?'}`,
+    data,
+    createdAt: new Date().toISOString()
+  };
+  list.unshift(rec);            // newest first
+  setGeneratedPapers(list);
+}
+
+function renderGeneratedPapers(){
+  const list = getGeneratedPapers();
+  generatedPapersGrid.innerHTML = '';
+  if (!list.length){
+    generatedPapersGrid.innerHTML = '<div class="text-muted">No generated papers yet</div>';
+    return;
+  }
+  list.forEach((rec, idx) => {
+    const d = rec.data || {};
+    const card = document.createElement('div');
+    card.className = 'template-card';
+    card.innerHTML = `
+      <div>
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h6 class="mb-1" style="font-size:0.95rem;">${rec.name}</h6>
+            <div class="small text-muted">${new Date(rec.createdAt).toLocaleString()}</div>
+          </div>
+          <div class="text-end">
+            <div class="small text-muted">Q: ${d.questionTotals?.totalQuestions || 0}</div>
+            <div class="small text-muted">M: ${d.questionTotals?.totalMarks || 0}</div>
+          </div>
+        </div>
+        <div class="small mb-2"><strong>Board:</strong> ${d.schoolBoard || '—'} &nbsp; <strong>Class:</strong> ${d.class || '—'}</div>
+        <div class="mb-2"><strong>Subject:</strong> ${d.subject || '—'}</div>
+        <div class="mb-2">
+          ${(d.chapters || []).slice(0,6).map(c => `<span class="badge text-bg-secondary me-1 mb-1">${c}</span>`).join(' ') || '<span class="text-muted">No chapters</span>'}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-primary gp-preview-btn" data-idx="${idx}">
+          <i class="bi bi-eye me-1"></i>Preview
+        </button>
+        <button class="btn btn-sm btn-outline-success gp-ans-btn" data-idx="${idx}">
+          <i class="bi bi-journal-text me-1"></i>Answer Key
+        </button>
+        <button class="btn btn-sm btn-outline-danger gp-del-btn" data-idx="${idx}">
+          <i class="bi bi-trash me-1"></i>Delete
+        </button>
+      </div>
+    `;
+    generatedPapersGrid.appendChild(card);
+  });
+
+  // attach handlers
+  generatedPapersGrid.querySelectorAll('.gp-preview-btn').forEach(b => b.addEventListener('click', () => {
+    const idx = parseInt(b.dataset.idx,10);
+    const list = getGeneratedPapers();
+    if (list[idx]) showGeneratedPreview(list[idx].data);
+  }));
+  generatedPapersGrid.querySelectorAll('.gp-ans-btn').forEach(b => b.addEventListener('click', () => {
+    const idx = parseInt(b.dataset.idx,10);
+    const list = getGeneratedPapers();
+    if (list[idx]) downloadAnswerKeyFor(list[idx].data);
+  }));
+  generatedPapersGrid.querySelectorAll('.gp-del-btn').forEach(b => b.addEventListener('click', () => {
+    const idx = parseInt(b.dataset.idx,10);
+    if (!confirm('Delete this paper from history?')) return;
+    const list = getGeneratedPapers();
+    list.splice(idx,1);
+    setGeneratedPapers(list);
+    renderGeneratedPapers();
+  }));
+}
+
+// clear-all button
+clearAllPapersBtn?.addEventListener('click', () => {
+  if (!confirm('Clear all generated papers?')) return;
+  localStorage.removeItem('qp_generated_papers');
+  renderGeneratedPapers();
+});
+
+// helper used by both Preview panel and list
+function downloadAnswerKeyFor(d){
+  let txt = `
+Answer Key
+School: ${d.schoolName || '—'}
+Board: ${d.schoolBoard || '—'}
+Class: ${d.class || '—'}
+Subject: ${d.subject || '—'}
+
+Chapters: ${(d.chapters && d.chapters.length) ? d.chapters.join(', ') : '—'}
+
+Questions: ${d.questionTotals?.totalQuestions ?? '—'}
+Marks: ${d.questionTotals?.totalMarks ?? '—'}
+
+====================
+ANSWERS
+====================
+`;
+  if (Array.isArray(d.questions) && d.questions.length){
+    d.questions.forEach((q, i) => {
+      txt += `Q${i+1}. ${q?.answer || '(No answer provided)'}\n\n`;
+    });
+  } else {
+    txt += '(No answers available)';
+  }
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Answer_Key_${(d.subject||'Subject')}_Class${(d.class||'?')}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+  }
+
+  function applyTemplate(tpl){
+    if (!tpl || !tpl.data) return;
+    const d = tpl.data;
+    schoolNameEl.value = d.schoolName || '';
+    boardEl.value = d.schoolBoard || '';
+    // populate subjects immediately without using events
+    subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
+    if (d.class) {
+      classEl.value = d.class;
+      const list = (subjects[d.schoolBoard] && subjects[d.schoolBoard][d.class]) ? subjects[d.schoolBoard][d.class] : [];
+      subjectEl.disabled = false;
+      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
+      list.forEach(s => subjectEl.add(new Option(s, s)));
+    }
+    subjectEl.value = d.subject || '';
+    populateChapters();
+    // set chapters & other settings after short delay to allow DOM update
+    setTimeout(()=> {
+      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => {
+        cb.checked = d.chapters && d.chapters.includes(cb.value);
+      });
+      // apply question distribution
+      if (d.questionDistribution) {
+        document.querySelectorAll('.question-type-group').forEach(group => {
+          const label = group.querySelector('.form-label.fw-bold').textContent.trim();
+          const info = d.questionDistribution[label];
+          group.querySelector('.question-count').value = info ? info.count : 0;
+          group.querySelector('.marks-per-question').value = info ? info.marks : group.querySelector('.marks-per-question').value;
         });
-    </script>
+      }
+      // difficulty
+      if (d.difficultyDistribution) {
+        const e = parseInt(d.difficultyDistribution.Easy || 0);
+        const m = parseInt(d.difficultyDistribution.Medium || 0);
+        const p1 = e;
+        const p2 = e + m;
+        handle1.style.left = p1 + '%';
+        handle2.style.left = p2 + '%';
+        updateDistribution();
+      }
+      updateSummary();
+    },150);
+  }
+
+  /* ===================== Utility calls on load ===================== */
+  function renderTemplatesIfAny(){ renderTemplates(); }
+  renderTemplatesIfAny();
+
+  </script>
+
+  <!-- Bootstrap JS (bundle) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

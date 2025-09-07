@@ -8,15 +8,19 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\vikra\Desktop\ai-question-paper-generator\venv
+<<<<<<< HEAD
+set "VIRTUAL_ENV=C:\Users\abhis\Desktop\ai-question-paper-generator-main\venv"
+=======
+set "VIRTUAL_ENV=C:\Users\abhis\Desktop\ai-question-paper-generator\venv"
+>>>>>>> 48d25291ec6ce5143a5da61eefe84cd3b7c1546c
 
 if not defined PROMPT set PROMPT=$P$G
 
 if defined _OLD_VIRTUAL_PROMPT set PROMPT=%_OLD_VIRTUAL_PROMPT%
 if defined _OLD_VIRTUAL_PYTHONHOME set PYTHONHOME=%_OLD_VIRTUAL_PYTHONHOME%
 
-set _OLD_VIRTUAL_PROMPT=%PROMPT%
-set PROMPT=(venv) %PROMPT%
+set "_OLD_VIRTUAL_PROMPT=%PROMPT%"
+set "PROMPT=(venv) %PROMPT%"
 
 if defined PYTHONHOME set _OLD_VIRTUAL_PYTHONHOME=%PYTHONHOME%
 set PYTHONHOME=
@@ -24,8 +28,8 @@ set PYTHONHOME=
 if defined _OLD_VIRTUAL_PATH set PATH=%_OLD_VIRTUAL_PATH%
 if not defined _OLD_VIRTUAL_PATH set _OLD_VIRTUAL_PATH=%PATH%
 
-set PATH=%VIRTUAL_ENV%\Scripts;%PATH%
-set VIRTUAL_ENV_PROMPT=(venv) 
+set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
+set "VIRTUAL_ENV_PROMPT=venv"
 
 :END
 if defined _OLD_CODEPAGE (
