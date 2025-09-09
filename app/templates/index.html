@@ -87,16 +87,29 @@
     .preview-card { border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:0 6px 16px -8px var(--shadow); margin-top:1rem; }
 
     /* Saved Templates button (moved to top-left) */
-    #openTemplatesBtn { position:fixed; top:20px; left:20px; z-index:1080; border-radius:8px; padding:.5rem .9rem; font-weight:700; }
-    #openPapersBtn{
-  position:fixed;
-  top:70px;          /* sits just below Saved Templates */
-  left:20px;
-  z-index:1080;
-  border-radius:8px;
-  padding:.5rem .9rem;
-  font-weight:700;
+   /* Toolbar container (fixed on top-left) */
+#toolbar {
+  position: absolute;   /* instead of fixed */
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
+.container {
+  position: relative;
+}
+
+
+
+
+/* Buttons inside toolbar */
+#toolbar button {
+  border-radius: 8px;
+  padding: .5rem .9rem;
+  font-weight: 700;
+}
+
 
 
     /* Small summary styles */
@@ -139,6 +152,22 @@
     @media (max-width: 767px) {
       .summary-card { position: static; margin-top:1rem; }
     }
+  #miniChapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 100%;
+}
+
+#miniChapters .badge {
+  white-space: normal;      /* allow text to wrap */
+  word-break: break-word;   /* break very long words if needed */
+  max-width: 100%;          /* keep inside the preview card */
+  text-align: left;         /* align multi-line text neatly */
+}
+
+
+
   </style>
 </head>
 <body>
@@ -280,7 +309,11 @@
             <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-journal-check me-2"></i>Board</span><span id="miniBoard">...</span></li>
             <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-person-video2 me-2"></i>Class</span><span id="miniClass">...</span></li>
             <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-book-half me-2"></i>Subject</span><span id="miniSubject">...</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-list-check me-2"></i>Chapters</span><span id="miniChapters">...</span></li>
+            <li class="list-group-item">
+           <div><i class="bi bi-list-check me-2"></i>Chapters</div>
+           <div id="miniChapters" class="mt-2"></div>
+           </li>
+
             <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-question-circle me-2"></i>Questions</span><span id="miniQuestions">0</span></li>
             <li class="list-group-item text-center"><div style="color:var(--muted)">Total Marks</div><div id="miniMarks" style="font-size:1.4rem;color:var(--primary-color);font-weight:700">0</div></li>
           </ul>
@@ -296,14 +329,21 @@
   </div>
 
   <!-- Top-left Saved Templates button (replaces floating bottom-right) -->
-  <button id="openTemplatesBtn" class="btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas" aria-controls="templatesOffcanvas" title="Saved Templates">
+  <div class="container my-5">
+
+  </div><div id="toolbar">
+  <button id="openTemplatesBtn" class="btn btn-outline-primary"
+          data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas"
+          aria-controls="templatesOffcanvas" title="Saved Templates">
     <i class="bi bi-collection me-1"></i> Saved Templates
   </button>
+
   <button id="openPapersBtn" class="btn btn-outline-success"
-        data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
-        aria-controls="papersOffcanvas" title="Generated Papers">
-  <i class="bi bi-journals me-1"></i> Generated Papers
-</button>
+          data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
+          aria-controls="papersOffcanvas" title="Generated Papers">
+    <i class="bi bi-journals me-1"></i> Generated Papers
+  </button>
+</div>
 
 
   <!-- Offcanvas Sidebar for Saved Templates (left) -->
@@ -334,6 +374,7 @@
   </div>
 </div>
 
+<script src="chapters.js"></script>
 
   <script>
   /* ===================== Data ===================== */
@@ -361,7 +402,7 @@
       6: ['English','Mathematics','Science','Social Science'],
       7: ['English','Mathematics','Science','Social Science'],
       8: ['English','Mathematics','Science','Social Science'],
-      9: ['Mathematics','English','Physics','Chemistry','Biology','History & Civics'],
+      9: ['Mathematics','English','Physics','Chemistry','Biology','History & Civics','Geography','Computer','English Grammar'],
       10:['Mathematics','English','Physics','Chemistry','Biology','History & Civics','Geography','Computer','English Grammar'],
       11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
       12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
@@ -384,142 +425,6 @@
 
   /* Expanded chapters (realistic sample — extend as desired) */
  /* ======= Full Class 10 Chapters (CBSE, ICSE, State Board uses NCERT reference) ======= */
-const class10Chapters = {
-  CBSE: {
-    Mathematics: [
-      "Real Numbers",
-      "Polynomials",
-      "Pair of Linear Equations in Two Variables",
-      "Quadratic Equations",
-      "Arithmetic Progressions",
-      "Triangles",
-      "Coordinate Geometry",
-      "Introduction to Trigonometry",
-      "Applications of Trigonometry",
-      "Circles",
-      "Constructions",
-      "Areas Related to Circles",
-      "Surface Areas and Volumes",
-      "Statistics",
-      "Probability"
-    ],
-    Science: [
-      "Chemical Reactions and Equations",
-      "Acids, Bases and Salts",
-      "Metals and Non-metals",
-      "Carbon and its Compounds",
-      "Periodic Classification of Elements",
-      "Life Processes",
-      "Control and Coordination",
-      "How do Organisms Reproduce?",
-      "Heredity and Evolution",
-      "Light – Reflection and Refraction",
-      "The Human Eye and the Colourful World",
-      "Electricity",
-      "Magnetic Effects of Electric Current",
-      "Sources of Energy",
-      "Our Environment",
-      "Sustainable Management of Natural Resources"
-    ],
-    English: [
-      "First Flight (Prose) – A Letter to God, Nelson Mandela, Two Stories About Flying, From the Diary of Anne Frank, Glimpses of India, Mijbil the Otter, Madam Rides the Bus, The Sermon at Benares, The Proposal",
-      "First Flight (Poetry) – Dust of Snow, Fire and Ice, A Tiger in the Zoo, How to Tell Wild Animals, The Ball Poem, Amanda!, Animals, The Trees, Fog, The Tale of Custard the Dragon, For Anne Gregory",
-      "Footprints Without Feet – A Triumph of Surgery, The Thief’s Story, The Midnight Visitor, A Question of Trust, Footprints Without Feet, The Making of a Scientist, The Necklace, The Hack Driver, Bholi, The Book That Saved the Earth",
-      "Grammar – Tenses, Modals, Subject-Verb Agreement, Reported Speech, Clauses",
-      "Writing – Letter Writing, Article, Report, Analytical Paragraph"
-    ],
-    Hindi: [
-      "क्षितिज भाग 2 – पद्य खंड (चयनित कविताएँ), गद्य खंड (कहानियाँ और निबंध)",
-      "कृतिका भाग 2 – (चयनित अध्याय)",
-      "व्याकरण – संधि, समास, अलंकार, वाक्य परिवर्तन",
-      "लेखन कौशल – पत्र, निबंध, संवाद लेखन"
-    ],
-    "Social Science": [
-      "History – The Rise of Nationalism in Europe, Nationalism in India, The Making of a Global World, The Age of Industrialisation, Print Culture and the Modern World",
-      "Geography – Resources and Development, Forest and Wildlife Resources, Water Resources, Agriculture, Minerals and Energy Resources, Manufacturing Industries, Lifelines of National Economy",
-      "Political Science – Power Sharing, Federalism, Democracy and Diversity, Gender, Religion and Caste, Popular Struggles and Movements, Political Parties, Outcomes of Democracy, Challenges to Democracy",
-      "Economics – Development, Sectors of the Indian Economy, Money and Credit, Globalisation and the Indian Economy, Consumer Rights"
-    ],
-    "Computer Science": [
-      "Basics of Python Programming",
-      "Control Structures (Loops, Conditionals)",
-      "Functions and Modules",
-      "File Handling",
-      "Database Management (Introduction to SQL)",
-      "Internet and Networking Basics",
-      "Project Work"
-    ]
-  },
-
-  ICSE: {
-    Mathematics: [
-      "Commercial Mathematics – Shares and Dividends",
-      "Algebra – Factorisation, Quadratic Equations, Matrices, Arithmetic and Geometric Progressions",
-      "Geometry – Similarity, Circles",
-      "Mensuration – Areas and Volumes",
-      "Trigonometry – Identities, Heights and Distances",
-      "Statistics – Mean, Median, Mode",
-      "Probability – Basic Theorems",
-      "Coordinate Geometry – Distance, Section Formula, Equation of Line"
-    ],
-    English: [
-      "Prose (from Treasure Trove – A Collection of ICSE Poems and Short Stories)",
-      "Poetry (Selected Poems from Treasure Trove)",
-      "Drama – Shakespeare (The Merchant of Venice)",
-      "Grammar – Transformation of Sentences, Synthesis, Prepositions, Reported Speech",
-      "Composition and Precis Writing"
-    ],
-    Physics: [
-      "Force, Work, Energy and Power",
-      "Light – Reflection, Refraction, Lenses",
-      "Sound",
-      "Electricity and Magnetism",
-      "Heat",
-      "Modern Physics – Radioactivity"
-    ],
-    Chemistry: [
-      "Periodic Table",
-      "Chemical Bonding",
-      "Mole Concept and Stoichiometry",
-      "Metallurgy",
-      "Organic Chemistry",
-      "Acids, Bases and Salts",
-      "Analytical Chemistry",
-      "Study of Compounds – Hydrogen Chloride, Ammonia, Nitric Acid, Sulphuric Acid"
-    ],
-    Biology: [
-      "Cell – The Structure and Functions",
-      "Genetics and Evolution",
-      "Plant Physiology",
-      "Human Anatomy and Physiology",
-      "Pollution and Environment",
-      "Basic Biotechnology"
-    ],
-    "History & Civics": [
-      "The Union Legislature",
-      "The Union Executive",
-      "The Judiciary",
-      "The Indian National Movement (1915–1947)",
-      "Contemporary World History – The World Wars, United Nations, Non-Aligned Movement"
-    ],
-    "Geography": [
-      "Climate of India",
-      "Soils in India",
-      "Natural Vegetation of India",
-      "Water Resources",
-      "Agriculture in India",
-      "Industries in India",
-      "Transport in India",
-      "Waste Management"
-    ]
-  },
-
-  /* State Board = NCERT reference (same as CBSE) */
-  "State Board": {}
-};
-
-// Copy CBSE chapters into State Board automatically
-class10Chapters["State Board"] = JSON.parse(JSON.stringify(class10Chapters["CBSE"]));
 
   const questionTypes = [
     { id: 'MCQ', label: 'Multiple Choice', defaultMarks: 1 },
@@ -652,13 +557,22 @@ const generatedPapersGrid = document.getElementById('generatedPapersGrid');
     });
 
     // board -> populate subjects when class selected
-    boardEl.addEventListener('change', () => {
-      // clear subject and chapters
-      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
-      subjectEl.disabled = true;
-      clearChapters();
-      updateSummary();
-    });
+   boardEl.addEventListener('change', () => {
+  // clear subject and chapters
+  subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
+  subjectEl.disabled = true;
+  clearChapters();
+  updateSummary();
+
+  // ✅ repopulate if class already chosen
+  const cls = parseInt(classEl.value, 10);
+  if (!isNaN(cls)) {
+    subjectEl.disabled = false;
+    const list = (subjects[boardEl.value] && subjects[boardEl.value][cls]) ? subjects[boardEl.value][cls] : [];
+    list.forEach(s => subjectEl.add(new Option(s, s)));
+  }
+});
+
 
     classEl.addEventListener('change', () => {
       const board = boardEl.value;
@@ -816,31 +730,42 @@ generatePaperBtn.addEventListener('click', async () => {
     deselectAllChaptersBtn.disabled = true;
   }
 
-  function populateChapters() {
-    const board = boardEl.value;
-    const subj = subjectEl.value;
-    chaptersContainer.innerHTML = '';
-    selectAllChaptersBtn.disabled = true;
-    deselectAllChaptersBtn.disabled = true;
-    if (!board || !subj) { clearChapters(); return; }
-    
-    const cls = parseInt(classEl.value, 10); // get selected class
-    const chapters = (class10Chapters[board] && class10Chapters[board][subj]) 
-                      ? class10Chapters[board][subj] 
-                      : [];
-    
-    if (!chapters.length) { clearChapters('No chapters available'); return; }
-    
-    chapters.forEach((ch, idx) => {
-      const div = document.createElement('div');
-      div.className = 'form-check';
-      div.innerHTML = `<input class="form-check-input chapter-checkbox" type="checkbox" id="chap-${idx}" value="${ch}">
-                       <label class="form-check-label" for="chap-${idx}">${ch}</label>`;
-      chaptersContainer.appendChild(div);
-    });
-    selectAllChaptersBtn.disabled = false;
-    deselectAllChaptersBtn.disabled = false;
+function populateChapters() {
+  const board = boardEl.value;
+  const cls   = classEl.value;   // ✅ get class
+  const subj  = subjectEl.value;
+
+  chaptersContainer.innerHTML = '';
+  selectAllChaptersBtn.disabled = true;
+  deselectAllChaptersBtn.disabled = true;
+
+  if (!board || !cls || !subj) { 
+    clearChapters(); 
+    return; 
+  }
+
+  // ✅ now use chapters.js (chaptersData) instead of class10Chapters
+  const chapters = chaptersData?.[board]?.[cls]?.[subj] || [];
+
+  if (!chapters.length) { 
+    clearChapters('No chapters available'); 
+    return; 
+  }
+
+  chapters.forEach((ch, idx) => {
+    const div = document.createElement('div');
+    div.className = 'form-check';
+    div.innerHTML = `
+      <input class="form-check-input chapter-checkbox" type="checkbox" id="chap-${idx}" value="${ch}">
+      <label class="form-check-label" for="chap-${idx}">${ch}</label>
+    `;
+    chaptersContainer.appendChild(div);
+  });
+
+  selectAllChaptersBtn.disabled = false;
+  deselectAllChaptersBtn.disabled = false;
 }
+
 
 
  function updateSummary(){
@@ -865,7 +790,14 @@ generatePaperBtn.addEventListener('click', async () => {
   miniBoard.textContent = board;
   miniClass.textContent = cls;
   miniSubject.textContent = subj;
-  miniChapters.textContent = selectedCh.join(', ') || '...';
+if (selectedCh.length) {
+  miniChapters.innerHTML = selectedCh
+    .map(ch => `<span class="badge text-bg-secondary">${ch}</span>`)
+    .join(' ');
+} else {
+  miniChapters.innerHTML = '<span class="text-muted">...</span>';
+}
+
   miniQuestions.textContent = totalQ;
   miniMarks.textContent = totalMarks;
 }
