@@ -3,12 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simptions Intelligent Paper Generator — Full</title>
+  <title>Intelligent Paper Generator</title>
 
-  <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -41,12 +39,53 @@
       --hard:#f87171;
     }
 
-    html,body{ height:100%; background:var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+    html,body{ 
+        height:100%; 
+        background:var(--bg); 
+        color:var(--text); 
+        font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; 
+        overflow-x: hidden; /* Prevent horizontal scroll from decorative blobs */
+    }
+    
+    .main-container { position: relative; }
+
+    /* --- NEW --- Decorative Background Blobs */
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(100px);
+        will-change: transform;
+    }
+
+    body::before {
+        background-color: var(--primary-color);
+        width: 350px;
+        height: 350px;
+        top: -100px;
+        left: -150px;
+        opacity: 0.15;
+    }
+
+    body::after {
+        background-color: var(--accent-color);
+        width: 300px;
+        height: 300px;
+        bottom: -120px;
+        right: -100px;
+        opacity: 0.1;
+    }
+    /* --- END NEW --- */
+
 
     /* Cards & layout */
-    .main-card, .summary-card { background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 6px 16px -8px var(--shadow), 0 6px 12px -12px var(--shadow); }
+    .main-card, .offcanvas { background:var(--card); border:1px solid var(--border); color: var(--text); }
+    .main-card { border-radius:16px; box-shadow:0 6px 16px -8px var(--shadow), 0 6px 12px -12px var(--shadow); }
     .card-header { background:transparent; border-bottom:1px solid var(--border); padding:1rem 1.25rem; }
     .card-body { padding:1.5rem; }
+    .offcanvas-header { border-bottom: 1px solid var(--border); }
 
     /* Form steps */
     .form-step { display:none; animation:fadeIn .25s ease-out; }
@@ -54,1675 +93,697 @@
     @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
 
     .form-label { font-weight:600; color:var(--muted); font-size:0.95rem; }
-    .form-control, .form-select { border-radius:8px; background:transparent; border:1px solid var(--border); padding:10px 12px; font-weight:600; color:var(--text); }
+    .form-control, .form-select { border-radius:8px; background:var(--bg); border:1px solid var(--border); padding:10px 12px; font-weight:600; color:var(--text); }
     .form-control::placeholder { color: var(--muted); font-weight:500; }
+    .form-control.is-invalid { border-color: #dc3545; }
+
 
     .btn { border-radius:10px; font-weight:700; }
     .btn-primary { background:var(--primary-color); border:none; color:#fff; }
-    .btn-outline-secondary { border-radius:10px; }
+    .btn-primary:hover { background-color: #005a4f; }
+    .btn-outline-secondary { border-color: var(--border); color: var(--muted); }
+    .btn-outline-secondary:hover { background-color: var(--border); color: var(--text); }
+    .btn-success { background-color: #198754; border-color: #198754; }
 
     .progress { height:10px; border-radius:6px; background:var(--border); }
     .progress-bar { background:var(--accent-color); transition:width .35s ease-in-out; }
 
     /* Distribution bar */
     .distribution-bar { position:relative; width:100%; height:20px; background:var(--border); border-radius:10px; display:flex; overflow:hidden; }
-    .dist-segment { height:100%; transition:width .12s linear; }
-    .dist-segment.easy { background:var(--easy); border-radius:10px 0 0 10px; }
+    .dist-segment { height:100%; } /* Removed transition for smoother dragging */
+    .dist-segment.easy { background:var(--easy); }
     .dist-segment.medium { background:var(--med); }
-    .dist-segment.hard { background:var(--hard); border-radius:0 10px 10px 0; }
+    .dist-segment.hard { background:var(--hard); }
     .dist-handle { position:absolute; top:50%; transform:translate(-50%,-50%); width:24px; height:24px; border-radius:50%; background:var(--card); border:3px solid var(--primary-color); cursor:ew-resize; z-index:10; }
     .dist-labels { display:flex; justify-content:space-between; margin-top:8px; }
-    .badge { font-weight:700; }
 
-    .question-type-group { padding:12px; border-radius:8px; border:1px solid var(--border); background:transparent; }
-
-    /* Chapters container */
-    #chaptersContainer { max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--card); }
-
-    /* Template cards (offcanvas) */
-    .template-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
-    .template-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; min-height:120px; }
-
-    /* Preview style */
-    .preview-card { border-radius:12px; border:1px solid var(--border); background:var(--card); padding:16px; box-shadow:0 6px 16px -8px var(--shadow); margin-top:1rem; }
-
-    /* Saved Templates button (moved to top-left) */
-   /* Toolbar container (fixed on top-left) */
-#toolbar {
-  position: absolute;   /* instead of fixed */
-  top: 20px;
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.container {
-  position: relative;
-}
-
-
-
-
-/* Buttons inside toolbar */
-#toolbar button {
-  border-radius: 8px;
-  padding: .5rem .9rem;
-  font-weight: 700;
-}
-
-
-
-    /* Small summary styles */
-    .summary-value { font-weight:700; color:var(--text); }
-
-    /* --- Dark Mode fixes (override Bootstrap defaults) --- */
-    [data-bs-theme="dark"] .main-card,
-    [data-bs-theme="dark"] .summary-card,
-    [data-bs-theme="dark"] .template-card,
-    [data-bs-theme="dark"] .preview-card {
-      background-color: var(--card) !important;
-      border-color: var(--border) !important;
-      color: var(--text) !important;
-    }
-
-    [data-bs-theme="dark"] .list-group-item {
-      background-color: var(--card) !important;
-      border-color: var(--border) !important;
-      color: var(--text) !important;
-    }
-
+    .question-type-group { padding:12px; border-radius:8px; border:1px solid var(--border); }
+    #chaptersContainer { max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg); }
+    
+    #toolbar { position: absolute; top: 0; left: 0; }
+    .paper-history-card { border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    
+    /* Dark Mode Overrides */
     [data-bs-theme="dark"] .form-control,
-    [data-bs-theme="dark"] .form-select {
+    [data-bs-theme="dark"] .form-select,
+    [data-bs-theme="dark"] #chaptersContainer,
+    [data-bs-theme="dark"] .offcanvas {
       background-color: var(--bg) !important;
       border-color: var(--border) !important;
       color: var(--text) !important;
     }
-
-    [data-bs-theme="dark"] #chaptersContainer {
-      background-color: var(--card) !important;
-      border-color: var(--border) !important;
-    }
-
-    [data-bs-theme="dark"] .btn-outline-secondary {
-      color: var(--text) !important;
-      border-color: var(--border) !important;
-    }
-
-    /* Responsive nicety */
-    @media (max-width: 767px) {
-      .summary-card { position: static; margin-top:1rem; }
-    }
-  #miniChapters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-width: 100%;
-}
-
-#miniChapters .badge {
-  white-space: normal;      /* allow text to wrap */
-  word-break: break-word;   /* break very long words if needed */
-  max-width: 100%;          /* keep inside the preview card */
-  text-align: left;         /* align multi-line text neatly */
-}
-
-
-
+    [data-bs-theme="dark"] .offcanvas { background-image: none; }
+    [data-bs-theme="dark"] .btn-outline-secondary { color: var(--text) !important; border-color: var(--border) !important; }
+    [data-bs-theme="dark"] .list-group-item { background-color: transparent !important; border-color: var(--border) !important;}
+    [data-bs-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
   </style>
 </head>
 <body>
-  <!-- Theme toggle -->
-  <div class="form-check form-switch position-fixed top-0 end-0 m-3 p-3" style="z-index:1050;">
-    <input id="themeToggle" class="form-check-input" type="checkbox" role="switch" />
-    <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars-fill"></i></label>
+  
+  <div class="position-fixed top-0 end-0 p-3" style="z-index:1050;">
+      <div class="d-flex align-items-center gap-2">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" id="langEn">EN</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="langHi">हिं</button>
+        </div>
+        <div class="form-check form-switch">
+            <input id="darkModeToggle" class="form-check-input" type="checkbox" role="switch" />
+            <label class="form-check-label" for="darkModeToggle"><i class="bi bi-moon-stars-fill"></i></label>
+        </div>
+      </div>
   </div>
 
-  <div class="container my-5">
-    <div class="text-center mb-4">
-      <h1 class="display-5 fw-bold">Intelligent Paper Generator</h1>
-      <p class="lead" style="color:var(--muted)">Build assessments quickly.</p>
+  <div class="container my-5 main-container">
+
+    <div id="toolbar">
+        <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas" aria-controls="papersOffcanvas">
+            <i class="bi bi-journals me-1"></i> <span data-lang-key="generatedPapers">Generated Papers</span>
+        </button>
+    </div>
+    
+    <div class="text-center mb-5">
+      <h1 class="display-5 fw-bold" data-lang-key="title">Intelligent Paper Generator</h1>
+      <p class="lead" style="color:var(--muted)" data-lang-key="subtitle">Build assessments quickly.</p>
     </div>
 
     <div class="row g-5">
-      <!-- Left: form -->
-      <div class="col-lg-8">
+      <div class="col-lg-10 col-xl-8 mx-auto">
         <div class="main-card">
           <div class="card-header">
             <div class="progress"><div id="progressBar" class="progress-bar" role="progressbar" style="width:0%"></div></div>
           </div>
 
           <div class="card-body">
-            <form id="paperForm" novalidate>
-              <!-- STEP 1 -->
-              <div class="form-step active" id="step-1">
-                <h4 class="mb-4 fw-bold">Step 1: Core Details</h4>
-                <div class="col-12">
-                <label for="examName" class="form-label">Examination Name</label>
-                <input id="examName" class="form-control" placeholder="e.g., Mid-Term Examination" required>
+            <form id="paperGeneratorForm" novalidate>
+              <div class="form-step active" id="step1">
+                <h4 class="mb-4 fw-bold" data-lang-key="step1Title">Step 1: Core Details</h4>
+                 <div class="mb-4">
+                    <label class="form-label" data-lang-key="generationMode">Generation Mode</label>
+                    <div class="btn-group d-flex" role="group">
+                        <button type="button" class="btn btn-outline-secondary" id="modeTopicBtn" data-lang-key="byTopic">By Topic</button>
+                        <button type="button" class="btn btn-primary" id="modeClassBtn" data-lang-key="byClassAndChapters">By Class & Chapters</button>
+                    </div>
                 </div>
-
+                
                 <div class="row g-3">
-                  <div class="col-12">
-                    <label for="schoolName" class="form-label">School Name</label>
-                    <input id="schoolName" class="form-control" placeholder="e.g., Delhi Public School" required>
-                  </div>
-
                   <div class="col-md-6">
-                    <label for="schoolBoard" class="form-label">School Board</label>
-                    <select id="schoolBoard" class="form-select" required>
-                      <option selected disabled value="">Choose...</option>
-                      <option value="CBSE">CBSE</option>
-                      <option value="ICSE">ICSE</option>
-                      <option value="State Board">State Board</option>
-                    </select>
+                      <label for="schoolBoard" class="form-label" data-lang-key="schoolBoard">School Board</label>
+                      <select class="form-select" id="schoolBoard" required>
+                          <option value="" data-lang-key="selectBoard">Select Board...</option>
+                          <option value="CBSE">CBSE</option>
+                          <option value="ICSE">ICSE</option>
+                          <option value="State Board">State Board</option>
+                      </select>
                   </div>
-
                   <div class="col-md-6">
-                    <label for="classSelect" class="form-label">Class</label>
-                    <select id="classSelect" class="form-select" required>
-                      <option selected disabled value="">Choose...</option>
-                    </select>
+                      <label for="paperLanguage" class="form-label" data-lang-key="paperLanguage">Paper Language</label>
+                      <select class="form-select" id="paperLanguage">
+                          <option value="english">English</option>
+                          <option value="hindi">Hindi</option>
+                      </select>
                   </div>
 
-                  <div class="col-12">
-                    <label for="subjectSelect" class="form-label">Subject</label>
-                    <select id="subjectSelect" class="form-select" required disabled>
-                      <option selected disabled value="">Waiting for class...</option>
-                    </select>
+                  <div class="col-12" id="topicField" style="display: none;">
+                      <label for="topic" class="form-label" data-lang-key="topic">Topic</label>
+                      <input type="text" class="form-control" id="topic" placeholder="e.g., Photosynthesis, Indian History">
                   </div>
 
-                  <div class="col-12">
-                    <label class="form-label">Select Chapters</label>
+                  <div class="col-md-6" id="classField">
+                      <label for="classSelect" class="form-label" data-lang-key="class">Class</label>
+                      <select class="form-select" id="classSelect" required>
+                           <option value="" data-lang-key="selectClass">Select Class...</option>
+                      </select>
+                  </div>
+                  <div class="col-md-6" id="subjectField">
+                      <label for="subjectSelect" class="form-label" data-lang-key="subject">Subject</label>
+                      <select class="form-select" id="subjectSelect" required>
+                          <option value="" data-lang-key="selectSubject">Select Subject...</option>
+                      </select>
+                  </div>
+                  <div class="col-12" id="chaptersField">
+                    <label class="form-label" data-lang-key="chapters">Select Chapters (<span data-lang-key="optional">Optional</span>)</label>
                     <div class="mb-2 d-flex gap-2">
-                      <button type="button" id="selectAllChapters" class="btn btn-sm btn-outline-primary" disabled><i class="bi bi-check2-square me-1"></i>Select All</button>
-                      <button type="button" id="deselectAllChapters" class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-x-square me-1"></i>Deselect All</button>
+                      <button type="button" id="selectAllChapters" class="btn btn-sm btn-outline-primary" disabled><i class="bi bi-check2-square me-1"></i><span data-lang-key="selectAll">Select All</span></button>
+                      <button type="button" id="deselectAllChapters" class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-x-square me-1"></i><span data-lang-key="deselectAll">Deselect All</span></button>
                     </div>
                     <div id="chaptersContainer">
-                      <small class="text-muted">Select board & subject to view chapters</small>
+                      <small class="text-muted" data-lang-key="selectClassSubjectPrompt">Please select a board, class and subject to see chapters.</small>
                     </div>
                   </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                  <button type="button" class="btn btn-primary next-btn">Next <i class="bi bi-arrow-right ms-1"></i></button>
+                  <button type="button" class="btn btn-primary next-btn"><span data-lang-key="next">Next</span> <i class="bi bi-arrow-right ms-1"></i></button>
                 </div>
               </div>
 
-              <!-- STEP 2 -->
-              <div class="form-step" id="step-2">
-                <h4 class="mb-4 fw-bold">Step 2: Question & Marks Distribution</h4>
-                <div class="row g-3" id="questionTypesContainer"></div>
+              <div class="form-step" id="step2">
+                <h4 class="mb-4 fw-bold" data-lang-key="step2Title">Step 2: Questions & Difficulty</h4>
+                <div class="row g-3" id="questionTypesContainer">
+                    </div>
+                
+                <div class="d-flex justify-content-end mt-3">
+                    <div class="p-2 fw-bold" style="background-color: var(--border); border-radius: 8px;">
+                        <span data-lang-key="totalMarks">Total Marks</span>: <span id="step2TotalMarks">0</span>
+                    </div>
+                </div>
+
+                 <hr class="my-4">
+                 <div>
+                    <label class="form-label fw-bold" data-lang-key="difficultyDistribution">Difficulty Distribution</label>
+                     <div class="distribution-bar-container">
+                      <div class="dist-labels">
+                        <div class="dist-label text-success"><span data-lang-key="easy">Easy</span>: <span class="badge text-bg-success" id="easyValueEl">40%</span></div>
+                        <div class="dist-label text-primary"><span data-lang-key="medium">Medium</span>: <span class="badge text-bg-primary" id="medValueEl">40%</span></div>
+                        <div class="dist-label text-danger"><span data-lang-key="hard">Hard</span>: <span class="badge text-bg-danger" id="hardValueEl">20%</span></div>
+                      </div>
+                      <div class="distribution-bar mt-2" id="distributionBar">
+                        <div class="dist-segment easy" id="easySeg"></div>
+                        <div class="dist-segment medium" id="medSeg"></div>
+                        <div class="dist-segment hard" id="hardSeg"></div>
+                        <div class="dist-handle" id="handle1" style="left:40%"></div>
+                        <div class="dist-handle" id="handle2" style="left:80%"></div>
+                      </div>
+                    </div>
+                 </div>
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i><span data-lang-key="previous">Previous</span></button>
+                  <button type="button" class="btn btn-primary next-btn"><span data-lang-key="next">Next</span> <i class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+              </div>
+
+              <div class="form-step" id="step3">
+                <h4 class="mb-4 fw-bold" data-lang-key="step3Title">Step 3: Final Details</h4>
+                 <div class="row g-4">
+                    <div class="col-md-6">
+                        <label for="examName" class="form-label">
+                            <span data-lang-key="examName">Examination Name</span> 
+                            <span class="text-muted" data-lang-key="optional">(Optional)</span>
+                        </label>
+                        <input type="text" class="form-control" id="examName" placeholder="e.g., Mid-Term Exam">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="schoolName" class="form-label">
+                            <span data-lang-key="schoolName">School Name</span> 
+                            <span class="text-muted" data-lang-key="optional">(Optional)</span>
+                        </label>
+                        <input type="text" class="form-control" id="schoolName" placeholder="e.g., Delhi Public School">
+                    </div>
+                </div>
+                
+                <div class="border rounded p-3 my-4" id="finalPreviewBox">
+                    <h5 data-lang-key="finalPreview">Final Preview</h5>
+                    <div id="finalPreviewContent" class="text-muted small mt-2"></div>
+                </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i>Previous</button>
-                  <button type="button" class="btn btn-primary next-btn">Next <i class="bi bi-arrow-right ms-1"></i></button>
+                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i><span data-lang-key="previous">Previous</span></button>
+                  <button type="button" id="generatePaperBtn" class="btn btn-success"><i class="bi bi-stars me-1"></i><span data-lang-key="generatePaper">Generate Paper</span></button>
                 </div>
               </div>
-
-              <!-- STEP 3 (final) -->
-              <div class="form-step" id="step-3">
-                <h4 class="mb-4 fw-bold">Step 3: Difficulty Distribution & Generate</h4>
-
-                <div class="distribution-bar-container">
-                  <div class="dist-labels">
-                    <div class="dist-label text-success">Easy: <span class="badge text-bg-success" id="easyValue">40%</span></div>
-                    <div class="dist-label text-primary">Medium: <span class="badge text-bg-primary" id="mediumValue">40%</span></div>
-                    <div class="dist-label text-danger">Hard: <span class="badge text-bg-danger" id="hardValue">20%</span></div>
-                  </div>
-
-                  <div class="distribution-bar mt-2" id="distributionBar">
-                    <div class="dist-segment easy" id="easySegment"></div>
-                    <div class="dist-segment medium" id="mediumSegment"></div>
-                    <div class="dist-segment hard" id="hardSegment"></div>
-                    <div class="dist-handle" id="handle1" style="left:40%"></div>
-                    <div class="dist-handle" id="handle2" style="left:80%"></div>
-                  </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4">
-                  <button type="button" class="btn btn-outline-secondary prev-btn"><i class="bi bi-arrow-left me-1"></i>Previous</button>
-                  <!-- Generate paper button in step 3 -->
-                  <button type="button" id="generatePaperBtn" class="btn btn-success"><i class="bi bi-stars me-1"></i>Generate Paper (Preview)</button>
-                </div>
-
-                <!-- Generated preview appears only here (inside Step 3) -->
-                <div id="generatedPaperContainer" class="mt-4"></div>
-              </div>
-
-              <!-- removed old STEP 4 and STEP 5 -->
-
             </form>
           </div>
         </div>
       </div>
-
-      <!-- Right: Live summary -->
-      <div class="col-lg-4">
-        <div class="summary-card p-4">
-          <div class="card-header" style="background:transparent;border:none;text-align:center;font-weight:700">Live Preview</div>
-          <ul class="list-group list-group-flush mb-3">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-           <span><i class="bi bi-pencil-square me-2"></i>Examination</span><span id="miniExam">...</span>
-           </li>
-
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-building me-2"></i>School</span><span id="miniSchool">...</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-journal-check me-2"></i>Board</span><span id="miniBoard">...</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-person-video2 me-2"></i>Class</span><span id="miniClass">...</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-book-half me-2"></i>Subject</span><span id="miniSubject">...</span></li>
-            <li class="list-group-item">
-           <div><i class="bi bi-list-check me-2"></i>Chapters</div>
-           <div id="miniChapters" class="mt-2"></div>
-           </li>
-
-            <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="bi bi-question-circle me-2"></i>Questions</span><span id="miniQuestions">0</span></li>
-            <li class="list-group-item text-center"><div style="color:var(--muted)">Total Marks</div><div id="miniMarks" style="font-size:1.4rem;color:var(--primary-color);font-weight:700">0</div></li>
-          </ul>
-
-          <div class="d-grid">
-            <button id="saveQuickBtn" class="btn btn-outline-primary"><i class="bi bi-save me-2"></i>Save as Template</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- removed the global generatedPaperContainer (preview only inside step 3) -->
-  </div>
-
-  <!-- Top-left Saved Templates button (replaces floating bottom-right) -->
-  <div class="container my-5">
-
-  </div><div id="toolbar">
-  <button id="openTemplatesBtn" class="btn btn-outline-primary"
-          data-bs-toggle="offcanvas" data-bs-target="#templatesOffcanvas"
-          aria-controls="templatesOffcanvas" title="Saved Templates">
-    <i class="bi bi-collection me-1"></i> Saved Templates
-  </button>
-
-  <button id="openPapersBtn" class="btn btn-outline-success"
-          data-bs-toggle="offcanvas" data-bs-target="#papersOffcanvas"
-          aria-controls="papersOffcanvas" title="Generated Papers">
-    <i class="bi bi-journals me-1"></i> Generated Papers
-  </button>
-</div>
-
-
-  <!-- Offcanvas Sidebar for Saved Templates (left) -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="templatesOffcanvas" aria-labelledby="templatesOffcanvasLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="templatesOffcanvasLabel">Saved Templates</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <small class="text-muted">Templates stored locally in your browser</small>
-        <button id="clearAllTemplates" class="btn btn-sm btn-outline-danger">Clear All</button>
-      </div>
-      <div id="savedTemplatesGrid" class="template-grid"></div>
     </div>
   </div>
+
   <div class="offcanvas offcanvas-start" tabindex="-1" id="papersOffcanvas" aria-labelledby="papersOffcanvasLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="papersOffcanvasLabel">Generated Papers</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <small class="text-muted">Your past generated papers (saved locally)</small>
-      <button id="clearAllPapers" class="btn btn-sm btn-outline-danger">Clear All</button>
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="papersOffcanvasLabel" data-lang-key="generatedPapers">Generated Papers</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body" id="generatedPapersContainer">
+        </div>
     </div>
-    <div id="generatedPapersGrid" class="template-grid"></div>
-  </div>
-</div>
 
-
-  <script>
-  /* ===================== Data ===================== */
-  const subjects = {
-    CBSE: {
-      1: ['English','Hindi','Mathematics','EVS'],
-      2: ['English','Hindi','Mathematics','EVS'],
-      3: ['English','Hindi','Mathematics','Science'],
-      4: ['English','Hindi','Mathematics','Science'],
-      5: ['English','Hindi','Mathematics','Science'],
-      6: ['English','Hindi','Mathematics','Science','Social Science'],
-      7: ['English','Hindi','Mathematics','Science','Social Science'],
-      8: ['English','Hindi','Mathematics','Science','Social Science'],
-      9: ['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
-      10:['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
-      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
-      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
-    },
-    ICSE: {
-      1: ['English','Environmental Studies'],
-      2: ['English','Environmental Studies'],
-      3: ['English','Mathematics','Environmental Studies'],
-      4: ['English','Mathematics','Environmental Studies'],
-      5: ['English','Mathematics','Environmental Studies'],
-      6: ['English','Mathematics','Science','Social Science'],
-      7: ['English','Mathematics','Science','Social Science'],
-      8: ['English','Mathematics','Science','Social Science'],
-      9: ['Mathematics','English','Physics','Chemistry','Biology','History & Civics','Geography','Computer','English Grammar'],
-      10:['Mathematics','English','Physics','Chemistry','Biology','History & Civics','Geography','Computer','English Grammar'],
-      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
-      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
-    },
-    "State Board": {
-      1: ['English','Regional Language'],
-      2: ['English','Regional Language'],
-      3: ['English','Mathematics','Science'],
-      4: ['English','Mathematics','Science'],
-      5: ['English','Mathematics','Science'],
-      6: ['English','Hindi','Mathematics','Science','Social Science'],
-      7: ['English','Hindi','Mathematics','Science','Social Science'],
-      8: ['English','Hindi','Mathematics','Science','Social Science'],
-      9: ['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
-      10:['English','Hindi','Mathematics','Science','Social Science','Computer Science'],
-      11:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science'],
-      12:['English','Physics','Chemistry','Mathematics','Biology','Economics','Accountancy','Computer Science']
-    }
-  };
-
-  /* Expanded chapters (realistic sample — extend as desired) */
- /* ======= Full Class 10 Chapters (CBSE, ICSE, State Board uses NCERT reference) ======= */
-const chaptersData = {
-  ICSE: {
-    6: {
-      English: [
-        "Prose – Stories from Treasure Trove",
-        "Poetry – Selected Poems",
-        "Grammar – Nouns, Pronouns, Verbs, Tenses, Prepositions",
-        "Composition – Essay, Letter, Story Writing"
-      ],
-      Mathematics: [
-        "Number System", "Fractions and Decimals", "Ratio and Proportion",
-        "Algebra Basics", "Geometry", "Mensuration", "Statistics", "Integers"
-      ],
-      Science: [
-        "Matter and Its States", "Living Organisms", "The Cell", "The Human Body",
-        "Light", "Magnetism", "Energy", "Air, Water and Environment"
-      ],
-      "Social Science": [
-        "History – Ancient Civilisations", "The Vedic Period", "Early Kingdoms",
-        "Civics – Local Self-Government", "Geography – The Earth, Latitudes and Longitudes",
-        "Climate, Soil and Natural Resources"
-      ]
-    },
-
-    7: {
-      English: [
-        "Prose – Short Stories", "Poetry – Selected Poems",
-        "Grammar – Sentence Structure, Transformation, Synthesis",
-        "Composition – Essays, Letters, Story Writing"
-      ],
-      Mathematics: [
-        "Integers", "Fractions and Decimals", "Algebraic Expressions",
-        "Simple Equations", "Lines and Angles", "Triangles", "Mensuration", "Data Handling"
-      ],
-      Science: [
-        "Nutrition in Plants and Animals", "Heat and Temperature", "Electricity and Magnetism",
-        "Acids, Bases and Salts", "Respiration", "Reproduction in Plants", "Soil and Environment"
-      ],
-      "Social Science": [
-        "History – Delhi Sultanate, Mughal Empire",
-        "Civics – Constitution, Democracy",
-        "Geography – Earth’s Structure, Rocks, Atmosphere, Water Cycle"
-      ]
-    },
-
-    8: {
-      English: [
-        "Prose – Literature Reader", "Poetry – Selected Poems",
-        "Grammar – Transformation, Synthesis, Direct/Indirect Speech",
-        "Composition – Essay, Letter, Comprehension"
-      ],
-      Mathematics: [
-        "Rational Numbers", "Linear Equations", "Algebraic Identities",
-        "Mensuration", "Geometry", "Factorisation", "Statistics", "Graphs"
-      ],
-      Science: [
-        "Crop Production", "Microorganisms", "Force and Pressure", "Friction",
-        "Sound", "Cell Structure and Functions", "Reaching the Age of Adolescence", "Pollution of Air and Water"
-      ],
-      "Social Science": [
-        "History – The Modern World, British Expansion in India",
-        "Civics – The Constitution, Rights and Duties",
-        "Geography – Resources, Industries, Population"
-      ]
-    },
-
-    9: {
-      Mathematics: [
-        "Algebra", "Mensuration", "Geometry – Triangles, Circles",
-        "Statistics", "Probability", "Coordinate Geometry","Trigonometry"
-      ],
-      English: [
-        "Prose – Short Stories from Treasure Trove",
-        "Poetry – Treasure Trove Poems",
-        "Drama – Shakespeare (Merchant of Venice – Acts I–III)",
-        "Grammar – Transformation, Synthesis, Prepositions, Reported Speech",
-        "Composition – Essays, Letters, Story"
-      ],
-      Physics: [
-        "Measurements and Experimentation",
-        "Motion in One Dimension",
-        "Laws of Motion",
-        "Heat and Energy",
-        "Light – Reflection, Refraction",
-        "Sound"
-      ],
-      Chemistry: [
-        "The Language of Chemistry",
-        "Chemical Reactions and Stoichiometry",
-        "Atomic Structure",
-        "Periodic Table",
-        "Study of Hydrogen, Oxygen, Chlorine",
-        "Chemical Bonding"
-      ],
-      Biology: [
-        "Cell – Structure and Function",
-        "Tissues",
-        "Nutrition",
-        "Respiration",
-        "Excretion",
-        "Health and Hygiene",
-        "Diseases"
-      ],
-      "History & Civics": [
-        "The Harappan Civilisation",
-        "The Vedic Period",
-        "Jainism and Buddhism",
-        "The Mauryan Empire",
-        "The Mughal Empire",
-        "Civics – Our Constitution, Fundamental Rights, Elections"
-      ],
-      Geography: [
-        "Earth as a Planet",
-        "Rotation and Revolution",
-        "Atmosphere",
-        "Hydrosphere",
-        "Soils in India",
-        "Natural Vegetation"
-      ],
-      Computer: [
-        "Introduction to Computers",
-        "Operating System Basics",
-        "Algorithms and Flowcharts",
-        "Programming in Java",
-        "Data Handling"
-      ],
-      "English Grammar": [
-        "Transformation of Sentences", "Prepositions",
-        "Conjunctions", "Direct and Indirect Speech"
-      ]
-    },
-
-    10: {
-      Mathematics: [
-      "Commercial Mathematics – Shares and Dividends",
-      "Algebra – Factorisation, Quadratic Equations, Matrices, Arithmetic and Geometric Progressions",
-      "Geometry – Similarity, Circles",
-      "Mensuration – Areas and Volumes",
-      "Trigonometry – Identities, Heights and Distances",
-      "Statistics – Mean, Median, Mode",
-      "Probability – Basic Theorems",
-      "Coordinate Geometry – Distance, Section Formula, Equation of Line"
-      ],
-      English: [
-        "Prose – Short Stories (Treasure Trove)",
-        "Poetry – Treasure Trove Poems",
-        "Drama – Shakespeare (Merchant of Venice – Acts IV–V)",
-        "Grammar – Transformation, Synthesis, Prepositions, Reported Speech",
-        "Composition and Precis Writing"
-      ],
-      Physics: [
-        "Force, Work, Energy and Power",
-        "Light – Reflection, Refraction, Lenses",
-        "Sound",
-        "Electricity and Magnetism",
-        "Heat",
-        "Modern Physics – Radioactivity"
-      ],
-      Chemistry: [
-        "Periodic Table",
-        "Chemical Bonding",
-        "Mole Concept and Stoichiometry",
-        "Metallurgy",
-        "Organic Chemistry",
-        "Acids, Bases and Salts",
-        "Analytical Chemistry",
-        "Study of Compounds – HCl, HNO₃, H₂SO₄, Ammonia"
-      ],
-      Biology: [
-        "Cell – Structure and Function",
-        "Genetics and Evolution",
-        "Plant Physiology",
-        "Human Anatomy and Physiology",
-        "Pollution and Environment",
-        "Biotechnology"
-      ],
-      "History & Civics": [
-        "Union Legislature",
-        "Union Executive",
-        "Judiciary",
-        "National Movement (1915–1947)",
-        "Contemporary World History – World Wars, UN, NAM"
-      ],
-      Geography: [
-        "Climate of India",
-        "Soils in India",
-        "Natural Vegetation",
-        "Water Resources",
-        "Agriculture in India",
-        "Industries in India",
-        "Transport in India",
-        "Waste Management"
-      ],
-      Computer: [
-        "Java Programming Basics",
-        "Class and Objects",
-        "Functions and Constructors",
-        "Inheritance",
-        "Arrays and Strings",
-        "File Handling"
-      ],
-      "English Grammar": [
-        "Transformation of Sentences",
-        "Synthesis of Sentences",
-        "Prepositions",
-        "Reported Speech"
-      ]
-    },
-
-    11: {
-      English: ["Prose – Essays", "Poetry – Anthology", "Drama – Shakespeare", "Grammar and Writing Skills"],
-      Physics: ["Physical World", "Units and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Gravitation", "Oscillations and Waves"],
-      Chemistry: ["Some Basic Concepts", "Structure of Atom", "Classification of Elements", "Chemical Bonding", "States of Matter", "Thermodynamics"],
-      Mathematics: ["Sets", "Relations & Functions", "Trigonometric Functions", "Limits and Derivatives", "Statistics", "Probability"],
-      Biology: ["The Living World", "Biological Classification", "Plant Kingdom", "Animal Kingdom", "Cell Structure and Function", "Human Physiology"],
-      Economics: ["Statistics for Economics", "Introductory Microeconomics"],
-      Accountancy: ["Introduction to Accounting", "Accounting Equations", "Journal, Ledger and Trial Balance"],
-      "Computer Science": ["Python Basics", "Flow of Control", "Functions", "Data Structures – Lists", "File Handling"]
-    },
-
-    12: {
-      English: ["Prose – Essays", "Poetry – Anthology", "Drama – Shakespeare", "Grammar and Advanced Writing"],
-      Physics: ["Electrostatics", "Current Electricity", "Magnetic Effects of Current", "Electromagnetic Induction", "Optics", "Dual Nature of Matter", "Atoms and Nuclei"],
-      Chemistry: ["Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry", "Organic Chemistry – Haloalkanes, Alcohols, Amines"],
-      Mathematics: ["Relations & Functions", "Inverse Trigonometry", "Matrices and Determinants", "Continuity and Differentiability", "Application of Derivatives", "Integrals", "Vectors", "3D Geometry"],
-      Biology: ["Reproduction in Organisms", "Genetics and Evolution", "Biology and Human Welfare", "Biotechnology", "Ecology"],
-      Economics: ["National Income Accounting", "Money and Banking", "Introductory Macroeconomics"],
-      Accountancy: ["Partnership Accounts", "Company Accounts", "Cash Flow Statement"],
-      "Computer Science": ["Python Advanced", "Data Handling", "SQL and Databases", "Computer Networks", "Boolean Algebra"]
-    }
-  },
-
-  CBSE: {
-    6: {
-      English: [
-        "Honeysuckle – Who Did Patrick’s Homework?, How the Dog Found Himself a New Master!, Taro’s Reward, An Indian-American Woman in Space, A Different Kind of School, Who I Am, Fair Play, A Game of Chance, Desert Animals, The Banyan Tree",
-        "Poetry – A House, A Home, The Kite, The Quarrel, Beauty, Where Do All the Teachers Go?, The Wonderful Words, Vocation",
-        "A Pact with the Sun – A Tale of Two Birds, The Friendly Mongoose, The Shepherd’s Treasure, The Old-Clock Shop, Tansen, The Monkey and the Crocodile, The Wonder Called Sleep"
-      ],
-      Hindi: [
-        "वह चिड़िया जो", "ज्योतिर्लिंग", "अनोखा उपहार", "नाना फड़नवीस", "संस्कृति",
-        "बाल महाभारत कथा", "पद्म – पद", "लोहे का स्वाद"
-      ],
-      Mathematics: [
-        "Knowing Our Numbers", "Whole Numbers", "Playing with Numbers",
-        "Basic Geometrical Ideas", "Understanding Elementary Shapes",
-        "Integers", "Fractions", "Decimals", "Data Handling", "Mensuration", "Algebra", "Ratio and Proportion", "Geometry", "Practical Geometry"
-      ],
-      Science: [
-        "Food: Where Does It Come From?", "Components of Food",
-        "Fibre to Fabric", "Sorting Materials into Groups",
-        "Separation of Substances", "Changes Around Us",
-        "Getting to Know Plants", "Body Movements",
-        "The Living Organisms and Their Surroundings",
-        "Motion and Measurement of Distances",
-        "Light, Shadows and Reflections", "Electricity and Circuits",
-        "Fun with Magnets", "Water", "Air Around Us", "Garbage In, Garbage Out"
-      ],
-      "Social Science": [
-        "History – What, Where, How and When?, On the Trail of the Earliest People, From Gathering to Growing Food, In the Earliest Cities, What Books and Burials Tell Us, Kingdoms, Kings and an Early Republic",
-        "Geography – The Earth in the Solar System, Globe Latitudes and Longitudes, Motions of the Earth, Maps, Major Domains of the Earth",
-        "Civics – Understanding Diversity, Diversity and Discrimination, What is Government?, Key Elements of a Democratic Government"
-      ]
-    },
-
-    7: {
-      English: [
-        "Honeycomb – Three Questions, A Gift of Chappals, Gopal and the Hilsa Fish, The Ashes That Made Trees Bloom, Quality, Expert Detectives, The Invention of Vita-Wonk, Fire: Friend and Foe, A Bicycle in Good Repair, The Story of Cricket",
-        "Poetry – The Squirrel, The Rebel, The Shed, Chivvy, Trees, Mystery of the Talking Fan, Meadow Surprises, Garden Snake",
-        "An Alien Hand – The Tiny Teacher, Bringing Up Kari, Golu Grows a Nose, Chandni, The Bear Story"
-      ],
-      Hindi: [
-        "हम पंछी उन्मुक्त गगन के", "दादी माँ", "हमारे आसपास", "नीलकंठ", "भाषा की यात्रा", "चिड़ियाघर", "गृह यात्रा"
-      ],
-      Mathematics: [
-        "Integers", "Fractions and Decimals", "Data Handling",
-        "Simple Equations", "Lines and Angles", "The Triangle and its Properties",
-        "Congruence of Triangles", "Comparing Quantities", "Rational Numbers",
-        "Perimeter and Area", "Algebra", "Exponents and Powers", "Symmetry", "Visualising Solid Shapes"
-      ],
-      Science: [
-        "Nutrition in Plants", "Nutrition in Animals", "Heat",
-        "Acids, Bases and Salts", "Physical and Chemical Changes",
-        "Respiration in Organisms", "Transportation in Animals and Plants",
-        "Reproduction in Plants", "Motion and Time", "Electric Current and its Effects",
-        "Light", "Forests – Our Lifeline", "Wastewater Story"
-      ],
-      "Social Science": [
-        "History – Tracing Changes through a Thousand Years, New Kings and Kingdoms, The Delhi Sultans, The Mughal Empire, Rulers and Buildings",
-        "Geography – Environment, Inside Our Earth, Our Changing Earth, Air, Water, Natural Vegetation and Wildlife",
-        "Civics – On Equality, Role of Government in Health, How the State Government Works, Growing up as Boys and Girls"
-      ]
-    },
-
-    8: {
-      English: [
-        "Honeydew – The Best Christmas Present, The Tsunami, Glimpses of the Past, Bepin Choudhury’s Lapse of Memory, The Summit Within, This is Jody’s Fawn, A Visit to Cambridge, A Short Monsoon Diary, The Great Stone Face",
-        "Poetry – The Ant and the Cricket, Geography Lesson, Macavity: The Mystery Cat, The Last Bargain, The School Boy, When I set out for Lyonnesse",
-        "It So Happened – How the Camel Got His Hump, Children at Work, The Selfish Giant, The Treasure Within, Princess September, The Fight"
-      ],
-      Hindi: [
-        "साँवले सपनों की याद", "कदम", "यह सबसे कठिन समय नहीं", "दीपदान", "मेघ आए", "बस की यात्रा", "फूल"
-      ],
-      Mathematics: [
-        "Rational Numbers", "Linear Equations in One Variable", "Understanding Quadrilaterals", "Practical Geometry",
-        "Data Handling", "Squares and Square Roots", "Cubes and Cube Roots", "Comparing Quantities",
-        "Algebraic Expressions and Identities", "Mensuration", "Exponents and Powers", "Direct and Inverse Proportions",
-        "Factorisation", "Introduction to Graphs"
-      ],
-      Science: [
-        "Crop Production and Management", "Microorganisms: Friend and Foe",
-        "Synthetic Fibres and Plastics", "Materials: Metals and Non-Metals",
-        "Coal and Petroleum", "Combustion and Flame", "Conservation of Plants and Animals",
-        "Reproduction in Animals", "Reaching the Age of Adolescence", "Force and Pressure",
-        "Friction", "Sound", "Chemical Effects of Electric Current", "Some Natural Phenomena", "Light", "Stars and the Solar System", "Pollution of Air and Water"
-      ],
-      "Social Science": [
-        "History – How, When and Where, From Trade to Territory, Ruling the Countryside, Tribals, Dikus and the Vision of a Golden Age, When People Rebel, The Making of the National Movement",
-        "Geography – Resources, Land Soil Water Natural Vegetation and Wildlife, Agriculture, Industries, Human Resources",
-        "Civics – The Indian Constitution, Understanding Secularism, Why Do We Need a Parliament?, Judiciary, Understanding Marginalisation"
-      ]
-    },
-
-    9: {
-      English: [
-        "Beehive – The Fun They Had, The Sound of Music, The Little Girl, A Truly Beautiful Mind, My Childhood, Packing, Reach for the Top, The Bond of Love, If I Were You",
-        "Poetry – The Road Not Taken, Wind, Rain on the Roof, The Lake Isle of Innisfree, A Legend of the Northland, No Men Are Foreign, The Snake Trying",
-        "Moments – The Lost Child, In the Kingdom of Fools, The Happy Prince, Weathering the Storm in Ersama, The Last Leaf, A House is Not a Home, The Beggar"
-      ],
-      Hindi: [
-        "कबीर – दोहे", "मीरा – पद", "निराला – गीत", "पद्यांश", "गद्यांश", "साखी"
-      ],
-      Mathematics: [
-        "Number Systems", "Polynomials", "Coordinate Geometry",
-        "Linear Equations in Two Variables", "Introduction to Euclid’s Geometry",
-        "Lines and Angles", "Triangles", "Quadrilaterals", "Circles",
-        "Heron’s Formula", "Surface Areas and Volumes", "Statistics", "Probability"
-      ],
-      Science: [
-        "Matter in Our Surroundings", "Is Matter Around Us Pure?", "Atoms and Molecules",
-        "Structure of the Atom", "The Fundamental Unit of Life", "Tissues",
-        "Diversity in the Living Organisms", "Motion", "Force and Laws of Motion",
-        "Gravitation", "Work and Energy", "Sound", "Natural Resources"
-      ],
-      "Social Science": [
-        "History – The French Revolution, Socialism in Europe and the Russian Revolution, Nazism and the Rise of Hitler, Forest Society and Colonialism, Pastoralists in the Modern World",
-        "Geography – India Size and Location, Physical Features of India, Drainage, Climate, Natural Vegetation and Wildlife, Population",
-        "Political Science – Democracy in the Contemporary World, Constitutional Design, Electoral Politics, Working of Institutions, Democratic Rights",
-        "Economics – The Story of Village Palampur, People as Resource, Poverty as a Challenge, Food Security in India"
-      ],
-      "Computer Science": [
-        "Basics of Information Technology", "Office Tools", "HTML Basics", "Introduction to Python Programming"
-      ]
-    },
-
-    10: {
-      Mathematics: [
-      "Real Numbers",
-      "Polynomials",
-      "Pair of Linear Equations in Two Variables",
-      "Quadratic Equations",
-      "Arithmetic Progressions",
-      "Triangles",
-      "Coordinate Geometry",
-      "Introduction to Trigonometry",
-      "Applications of Trigonometry",
-      "Circles",
-      "Constructions",
-      "Areas Related to Circles",
-      "Surface Areas and Volumes",
-      "Statistics",
-      "Probability"
-    ],
-    Science: [
-      "Chemical Reactions and Equations",
-      "Acids, Bases and Salts",
-      "Metals and Non-metals",
-      "Carbon and its Compounds",
-      "Periodic Classification of Elements",
-      "Life Processes",
-      "Control and Coordination",
-      "How do Organisms Reproduce?",
-      "Heredity and Evolution",
-      "Light – Reflection and Refraction",
-      "The Human Eye and the Colourful World",
-      "Electricity",
-      "Magnetic Effects of Electric Current",
-      "Sources of Energy",
-      "Our Environment",
-      "Sustainable Management of Natural Resources"
-    ],
-    English: [
-      "First Flight (Prose) – A Letter to God, Nelson Mandela, Two Stories About Flying, From the Diary of Anne Frank, Glimpses of India, Mijbil the Otter, Madam Rides the Bus, The Sermon at Benares, The Proposal",
-      "First Flight (Poetry) – Dust of Snow, Fire and Ice, A Tiger in the Zoo, How to Tell Wild Animals, The Ball Poem, Amanda!, Animals, The Trees, Fog, The Tale of Custard the Dragon, For Anne Gregory",
-      "Footprints Without Feet – A Triumph of Surgery, The Thief’s Story, The Midnight Visitor, A Question of Trust, Footprints Without Feet, The Making of a Scientist, The Necklace, The Hack Driver, Bholi, The Book That Saved the Earth",
-      "Grammar – Tenses, Modals, Subject-Verb Agreement, Reported Speech, Clauses",
-      "Writing – Letter Writing, Article, Report, Analytical Paragraph"
-    ],
-    Hindi: [
-      "क्षितिज भाग 2 – पद्य खंड (चयनित कविताएँ), गद्य खंड (कहानियाँ और निबंध)",
-      "कृतिका भाग 2 – (चयनित अध्याय)",
-      "व्याकरण – संधि, समास, अलंकार, वाक्य परिवर्तन",
-      "लेखन कौशल – पत्र, निबंध, संवाद लेखन"
-    ],
-    "Social Science": [
-      "History – The Rise of Nationalism in Europe, Nationalism in India, The Making of a Global World, The Age of Industrialisation, Print Culture and the Modern World",
-      "Geography – Resources and Development, Forest and Wildlife Resources, Water Resources, Agriculture, Minerals and Energy Resources, Manufacturing Industries, Lifelines of National Economy",
-      "Political Science – Power Sharing, Federalism, Democracy and Diversity, Gender, Religion and Caste, Popular Struggles and Movements, Political Parties, Outcomes of Democracy, Challenges to Democracy",
-      "Economics – Development, Sectors of the Indian Economy, Money and Credit, Globalisation and the Indian Economy, Consumer Rights"
-    ],
-    "Computer Science": [
-      "Basics of Python Programming",
-      "Control Structures (Loops, Conditionals)",
-      "Functions and Modules",
-      "File Handling",
-      "Database Management (Introduction to SQL)",
-      "Internet and Networking Basics",
-      "Project Work"
-    ]
-    },
-
-    11: {
-      English: [
-        "Hornbill – The Portrait of a Lady, We’re Not Afraid to Die, Discovering Tut, Landscape of the Soul, The Ailing Planet, The Browning Version",
-        "Poetry – A Photograph, The Laburnum Top, The Voice of the Rain",
-        "Snapshots – The Summer of the Beautiful White Horse, The Address, Mother’s Day"
-      ],
-      Physics: [
-        "Physical World", "Units and Measurements", "Motion in a Straight Line",
-        "Motion in a Plane", "Laws of Motion", "Work, Energy and Power",
-        "System of Particles and Rotational Motion", "Gravitation",
-        "Oscillations", "Waves"
-      ],
-      Chemistry: [
-        "Some Basic Concepts of Chemistry", "Structure of Atom", "Classification of Elements",
-        "Chemical Bonding", "States of Matter", "Thermodynamics", "Equilibrium",
-        "Redox Reactions", "Hydrogen", "s-Block, p-Block Elements"
-      ],
-      Mathematics: [
-        "Sets", "Relations and Functions", "Trigonometric Functions",
-        "Principle of Mathematical Induction", "Complex Numbers", "Linear Inequalities",
-        "Permutations and Combinations", "Binomial Theorem", "Sequences and Series",
-        "Straight Lines", "Conic Sections", "Introduction to Three-dimensional Geometry",
-        "Limits and Derivatives", "Statistics", "Probability"
-      ],
-      Biology: [
-        "The Living World", "Biological Classification", "Plant Kingdom",
-        "Animal Kingdom", "Morphology of Flowering Plants", "Anatomy of Flowering Plants",
-        "Cell Structure and Function", "Biomolecules", "Human Physiology"
-      ],
-      Economics: [
-        "Statistics for Economics – Collection, Organisation, Presentation of Data",
-        "Introductory Microeconomics – Central Problems, Consumer Behaviour, Producer Behaviour"
-      ],
-      Accountancy: [
-        "Introduction to Accounting", "Theory Base of Accounting",
-        "Recording of Transactions – I & II", "Bank Reconciliation Statement",
-        "Trial Balance and Rectification", "Depreciation", "Financial Statements"
-      ],
-      "Computer Science": [
-        "Python Basics", "Flow of Control", "Functions", "Strings and Lists", "File Handling", "Societal Impacts"
-      ]
-    },
-
-    12: {
-      English: [
-        "Flamingo – The Last Lesson, Lost Spring, Deep Water, Indigo, Poets and Pancakes, The Interview, Going Places",
-        "Poetry – My Mother at Sixty-six, An Elementary School Classroom, Keeping Quiet, A Thing of Beauty, A Roadside Stand, Aunt Jennifer’s Tigers",
-        "Vistas – The Third Level, The Tiger King, Journey to the End of the Earth, The Enemy, On the Face of It, Memories of Childhood"
-      ],
-      Physics: [
-        "Electrostatics", "Current Electricity", "Magnetic Effects of Current", "Electromagnetic Induction",
-        "Alternating Current", "Optics", "Dual Nature of Radiation and Matter",
-        "Atoms", "Nuclei", "Semiconductor Electronics", "Communication Systems"
-      ],
-      Chemistry: [
-        "Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics",
-        "Surface Chemistry", "p-Block Elements", "d-Block Elements", "f-Block Elements",
-        "Coordination Compounds", "Haloalkanes and Haloarenes", "Alcohols, Phenols and Ethers",
-        "Aldehydes, Ketones and Carboxylic Acids", "Amines", "Biomolecules", "Polymers", "Chemistry in Everyday Life"
-      ],
-      Mathematics: [
-        "Relations and Functions", "Inverse Trigonometric Functions",
-        "Matrices", "Determinants", "Continuity and Differentiability",
-        "Applications of Derivatives", "Integrals", "Applications of Integrals",
-        "Differential Equations", "Vector Algebra", "Three Dimensional Geometry",
-        "Linear Programming", "Probability"
-      ],
-      Biology: [
-        "Reproduction in Organisms", "Sexual Reproduction in Flowering Plants",
-        "Human Reproduction", "Reproductive Health",
-        "Principles of Inheritance and Variation", "Molecular Basis of Inheritance",
-        "Evolution", "Human Health and Disease", "Strategies for Enhancement in Food Production",
-        "Microbes in Human Welfare", "Biotechnology Principles and Processes",
-        "Biotechnology and Its Applications", "Organisms and Populations",
-        "Ecosystem", "Biodiversity and Conservation", "Environmental Issues"
-      ],
-      Economics: [
-        "Introductory Macroeconomics – National Income, Money and Banking, Government Budget, Balance of Payments",
-        "Indian Economic Development – Development Experience, Current Challenges, Human Capital Formation"
-      ],
-      Accountancy: [
-        "Accounting for Not-for-Profit Organisations", "Partnership Firms", "Company Accounts", "Cash Flow Statement", "Financial Statement Analysis"
-      ],
-      "Computer Science": [
-        "Python Revision", "Data Structures – Stacks, Queues", "File Handling", "Database Queries using SQL", "Computer Networks", "Boolean Algebra", "Societal Impacts"
-      ]
-    }
-  },
-    "State Board": {}
-};
-chaptersData["State Board"] = JSON.parse(JSON.stringify(chaptersData["CBSE"]));
-
-
-  const questionTypes = [
-    { id: 'MCQ', label: 'Multiple Choice', defaultMarks: 1 },
-    { id: 'Fill', label: 'Fill in the Blanks', defaultMarks: 1 },
-    { id: 'Short', label: 'Short Answer', defaultMarks: 3 },
-    { id: 'Long', label: 'Long Answer', defaultMarks: 5 },
-    { id: 'Match', label: 'Matching', defaultMarks: 4 },
-    { id: 'Case', label: 'Case Study', defaultMarks: 5 }
-  ];
-
-  /* ===================== DOM refs ===================== */
-  const paperForm = document.getElementById('paperForm');
-  const steps = Array.from(document.querySelectorAll('.form-step'));
-  const progressBar = document.getElementById('progressBar');
-
-  const examNameEl = document.getElementById('examName');
- const miniExam = document.getElementById('miniExam');
-  const schoolNameEl = document.getElementById('schoolName');
-  const boardEl = document.getElementById('schoolBoard');
-  const classEl = document.getElementById('classSelect');
-  const subjectEl = document.getElementById('subjectSelect');
-  const chaptersContainer = document.getElementById('chaptersContainer');
-  const selectAllChaptersBtn = document.getElementById('selectAllChapters');
-  const deselectAllChaptersBtn = document.getElementById('deselectAllChapters');
-
-  const qTypesContainer = document.getElementById('questionTypesContainer');
-
-  const easySeg = document.getElementById('easySegment');
-  const medSeg = document.getElementById('mediumSegment');
-  const hardSeg = document.getElementById('hardSegment');
-  const distBar = document.getElementById('distributionBar');
-  const handle1 = document.getElementById('handle1');
-  const handle2 = document.getElementById('handle2');
-  const easyValueEl = document.getElementById('easyValue');
-  const medValueEl = document.getElementById('mediumValue');
-  const hardValueEl = document.getElementById('hardValue');
-
-  const miniSchool = document.getElementById('miniSchool');
-  const miniBoard = document.getElementById('miniBoard');
-  const miniClass = document.getElementById('miniClass');
-  const miniSubject = document.getElementById('miniSubject');
-  const miniChapters = document.getElementById('miniChapters');
-  const miniQuestions = document.getElementById('miniQuestions');
-  const miniMarks = document.getElementById('miniMarks');
-
-  const saveQuickBtn = document.getElementById('saveQuickBtn');
-  const savedTemplatesGrid = document.getElementById('savedTemplatesGrid');
-  const openPapersBtn = document.getElementById('openPapersBtn');
-const clearAllPapersBtn = document.getElementById('clearAllPapers');
-const generatedPapersGrid = document.getElementById('generatedPapersGrid');
-
-
-  const themeToggle = document.getElementById('themeToggle');
-  const generatePaperBtn = document.getElementById('generatePaperBtn');
-  const openTemplatesBtn = document.getElementById('openTemplatesBtn');
-  const clearAllTemplatesBtn = document.getElementById('clearAllTemplates');
-
-  let currentStep = 0;
-
-  /* ===================== Init ===================== */
-  document.addEventListener('DOMContentLoaded', () => {
-    // populate class 1..12
-    for (let i=1;i<=12;i++) classEl.add(new Option(i, i));
-
-    // create question groups
-    qTypesContainer.innerHTML = questionTypes.map(q => `
-      <div class="col-md-6 question-type-group">
-        <label class="form-label fw-bold">${q.label}</label>
-        <div class="row g-2">
-          <div class="col-6">
-            <div class="input-group">
-              <span class="input-group-text">#</span>
-              <input type="number" class="form-control question-count" id="num${q.id}" value="0" min="0" required>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="input-group">
-              <span class="input-group-text">Marks</span>
-              <input type="number" class="form-control marks-per-question" id="marks${q.id}" value="${q.defaultMarks}" min="1" required>
-            </div>
-          </div>
-        </div>
-      </div>
-    `).join('');
-
-    attachHandlers();
-    showStep(0);
-
-    // restore theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.setAttribute('data-bs-theme','dark');
-      themeToggle.checked = true;
-    } else {
-      document.documentElement.setAttribute('data-bs-theme','light');
-      themeToggle.checked = false;
-    }
-
-    updateSummary();
-    updateDistribution();
-    renderTemplates(); // render templates in offcanvas
-    renderGeneratedPapers();
-
-  });
-
-  /* ===================== Handlers ===================== */
-  function attachHandlers(){
-    // theme toggle
-    themeToggle.addEventListener('change', () => {
-      const theme = themeToggle.checked ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-bs-theme', theme);
-      localStorage.setItem('theme', theme);
-    });
-
-    // step navigation (delegated)
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.next-btn')) {
-        if (currentStep < steps.length-1) showStep(currentStep+1);
-      }
-      if (e.target.closest('.prev-btn')) {
-        if (currentStep > 0) showStep(currentStep-1);
-      }
-    });
-
-    // clear all templates
-    clearAllTemplatesBtn?.addEventListener('click', () => {
-      if (!confirm('Clear all saved templates?')) return;
-      localStorage.removeItem('qp_templates');
-      renderTemplates();
-    });
-
-    // board -> populate subjects when class selected
-   boardEl.addEventListener('change', () => {
-  // clear subject and chapters
-  subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
-  subjectEl.disabled = true;
-  clearChapters();
-  updateSummary();
-
-  // ✅ repopulate if class already chosen
-  const cls = parseInt(classEl.value, 10);
-  if (!isNaN(cls)) {
-    subjectEl.disabled = false;
-    const list = (subjects[boardEl.value] && subjects[boardEl.value][cls]) ? subjects[boardEl.value][cls] : [];
-    list.forEach(s => subjectEl.add(new Option(s, s)));
-  }
-});
-
-
-    classEl.addEventListener('change', () => {
-      const board = boardEl.value;
-      const cls = parseInt(classEl.value,10);
-      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
-      subjectEl.disabled = false;
-      const list = (subjects[board] && subjects[board][cls]) ? subjects[board][cls] : [];
-      list.forEach(s => subjectEl.add(new Option(s, s)));
-      clearChapters();
-      updateSummary();
-    });
-
-    subjectEl.addEventListener('change', () => {
-      populateChapters();
-      updateSummary();
-    });
-
-    // select/deselect chapters
-    selectAllChaptersBtn.addEventListener('click', () => {
-      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = true);
-      updateSummary();
-    });
-    deselectAllChaptersBtn.addEventListener('click', () => {
-      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = false);
-      updateSummary();
-    });
-
-    // save templates
-    saveQuickBtn.addEventListener('click', saveTemplate);
-
-
-// generate preview button (only in Step 3)
-generatePaperBtn.addEventListener('click', async () => {
-  // ... (unchanged validation code) ...
-  const payload = buildPayload();
-  try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`API error ${res.status}`);
-    const data = await res.json();
-    // Defensive fallbacks if backend keys differ
-    const questions = Array.isArray(data.questions) ? data.questions : [];
-    const totalQ = data.summary?.total_questions ?? questions.length ?? 0;
-    const totalM = data.summary?.total_marks ?? 0;
-    const pdfUrl    = data.pdf_url    || '#';
-    const wordUrl   = data.word_url   || '#';
-    const answerUrl = data.answer_key_url || '#';
-    const container = document.getElementById('generatedPaperContainer');
-    container.innerHTML = `
-      <div class="preview-card">
-        <h5 class="mb-3">Generated Paper</h5>
-        <p><strong>Total Questions:</strong> ${totalQ}</p>
-        <p><strong>Total Marks:</strong> ${totalM}</p>
-        <ol>
-          ${questions.map(q => `<li>${q.type || q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
-        </ol>
-        <div class="d-flex gap-2 mt-3">
-          <a href="${pdfUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
-          </a>
-          <a href="${wordUrl}" target="_blank" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-file-earmark-word me-1"></i>Download Word
-          </a>
-          <a href="${answerUrl}" target="_blank" class="btn btn-outline-success btn-sm">
-            <i class="bi bi-journal-text me-1"></i>Download Answer Key
-          </a>
-        </div>
-      </div>
-    `;
-    // Update live preview numbers (right panel) after paper generation
-    // miniQuestions.textContent = totalQ;
-    // miniMarks.textContent = totalM;
-    // Scroll to preview
-    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } catch (err) {
-    console.error(err);
-    alert('Failed to generate paper from backend. Check server logs.');
-  }
-});
-
-
-
-    // Show backend-generated paper
-    const container = document.getElementById('generatedPaperContainer');
-    container.innerHTML = `
-      <div class="preview-card">
-        <h5 class="mb-3">Generated Paper</h5>
-        <p><strong>Total Questions:</strong> ${data.summary.total_questions}</p>
-        <p><strong>Total Marks:</strong> ${data.summary.total_marks}</p>
-        <ol>${data.questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
-        <div class="d-flex gap-2 mt-3">
-          <a href="${data.pdf_url}" target="_blank" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</a>
-          <a href="${data.word_url}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</a>
-          <a href="${data.answer_key_url}" target="_blank" class="btn btn-outline-success btn-sm"><i class="bi bi-journal-text me-1"></i>Download Answer Key</a>
-        </div>
-      </div>
-    `;
-
-  } 
-
-    // update summary on inputs
-    paperForm.addEventListener('input', (e) => {
-      if (e.target.matches('input[required], select[required]')) {
-        if (e.target.value && e.target.value !== '') e.target.classList.remove('is-invalid');
-      }
-      updateSummary();
-    });
-
-    // chapter checkbox change -> update summary
-    chaptersContainer.addEventListener('change', (e) => {
-      if (e.target.matches('.chapter-checkbox')) updateSummary();
-    });
-
-    // question counts/marks update
-    qTypesContainer.addEventListener('input', updateSummary);
-
-    // make distribution handles draggable
-    makeDraggable(handle1);
-    makeDraggable(handle2);
-    // ensure handles start at 40% and 80%
-    handle1.style.left = '40%'; handle2.style.left = '80%';
-    updateDistribution();
-  
-
-  /* ===================== Steps & Validation ===================== */
-  function validateStep(idx) {
-    const stepEl = steps[idx];
-    const requireds = stepEl.querySelectorAll('input[required], select[required]');
-    let ok = true;
-    requireds.forEach(el => {
-      if (!el.value || el.value === '') {
-        el.classList.add('is-invalid'); ok = false;
-      } else el.classList.remove('is-invalid');
-    });
-    return ok;
-  }
-
-  function showStep(idx) {
-    // if moving forward validate current first
-    if (idx > currentStep && !validateStep(currentStep)) return;
-    steps.forEach((s,i) => s.classList.toggle('active', i === idx));
-    currentStep = idx;
-    const pct = (currentStep / (steps.length - 1)) * 100;
-    progressBar.style.width = pct + '%';
-    updateSummary();
-  }
-
-  /* ===================== Chapters ===================== */
-  function clearChapters(msg = 'Select board & subject to view chapters') {
-    chaptersContainer.innerHTML = `<small class="text-muted">${msg}</small>`;
-    selectAllChaptersBtn.disabled = true;
-    deselectAllChaptersBtn.disabled = true;
-  }
-
-function populateChapters() {
-  const board = boardEl.value;
-  const cls   = classEl.value;   // ✅ get class
-  const subj  = subjectEl.value;
-
-  chaptersContainer.innerHTML = '';
-  selectAllChaptersBtn.disabled = true;
-  deselectAllChaptersBtn.disabled = true;
-
-  if (!board || !cls || !subj) { 
-    clearChapters(); 
-    return; 
-  }
-
-  // ✅ now use chapters.js (chaptersData) instead of class10Chapters
-  const chapters = chaptersData?.[board]?.[cls]?.[subj] || [];
-
-  if (!chapters.length) { 
-    clearChapters('No chapters available'); 
-    return; 
-  }
-
-  chapters.forEach((ch, idx) => {
-    const div = document.createElement('div');
-    div.className = 'form-check';
-    div.innerHTML = `
-      <input class="form-check-input chapter-checkbox" type="checkbox" id="chap-${idx}" value="${ch}">
-      <label class="form-check-label" for="chap-${idx}">${ch}</label>
-    `;
-    chaptersContainer.appendChild(div);
-  });
-
-  selectAllChaptersBtn.disabled = false;
-  deselectAllChaptersBtn.disabled = false;
-}
-
-
-
- function updateSummary(){
-  const exam = examNameEl.value || '...';
-  const school = schoolNameEl.value || '...';
-  const board = boardEl.value || '...';
-  const cls = classEl.value || '...';
-  const subj = subjectEl.value || '...';
-  const selectedCh = Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value);
-  const qGroups = Array.from(document.querySelectorAll('.question-type-group'));
-  let totalQ = 0, totalMarks = 0;
-  qGroups.forEach(group => {
-    const count = parseInt(group.querySelector('.question-count').value) || 0;
-    const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
-    totalQ += count;
-    totalMarks += count * marks;
-  });
-
-  // mini summary
-  miniSchool.textContent = school;
-  miniExam.textContent = exam;
-  miniBoard.textContent = board;
-  miniClass.textContent = cls;
-  miniSubject.textContent = subj;
-if (selectedCh.length) {
-  miniChapters.innerHTML = selectedCh
-    .map(ch => `<span class="badge text-bg-secondary">${ch}</span>`)
-    .join(' ');
-} else {
-  miniChapters.innerHTML = '<span class="text-muted">...</span>';
-}
-
-  miniQuestions.textContent = totalQ;
-  miniMarks.textContent = totalMarks;
-}
-
-  /* ===================== Build payload ===================== */
-  function buildPayload(){
-    const payload = {
-      examName: examNameEl.value.trim(),
-      schoolName: schoolNameEl.value.trim(),
-      schoolBoard: boardEl.value,
-      class: classEl.value,
-      subject: subjectEl.value,
-      chapters: Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value),
-      questionDistribution: {},
-      difficultyDistribution: {}
-    };
-    document.querySelectorAll('.question-type-group').forEach(group => {
-      const label = group.querySelector('.form-label.fw-bold').textContent.trim();
-      const count = parseInt(group.querySelector('.question-count').value || '0',10);
-      const marks = parseInt(group.querySelector('.marks-per-question').value || '1',10);
-      if (count > 0) payload.questionDistribution[label] = { count, marks };
-    });
-
-    // totals
-    const totals = { totalQuestions:0, totalMarks:0 };
-    Object.values(payload.questionDistribution).forEach(q => {
-      totals.totalQuestions += q.count;
-      totals.totalMarks += q.count * q.marks;
-    });
-    payload.questionTotals = totals;
-
-    // difficulty
-    const e = parseInt(easyValueEl.textContent.replace('%','')) || 0;
-    const m = parseInt(medValueEl.textContent.replace('%','')) || 0;
-    const h = parseInt(hardValueEl.textContent.replace('%','')) || 0;
-    payload.difficultyDistribution = { Easy: e, Medium: m, Hard: h };
-
-    return payload;
-  }
-
-  /* ===================== Generated preview (client-side) ===================== */
-  function showGeneratedPreview(payload) {
-    const container = document.getElementById('generatedPaperContainer');
-    const qTotal = payload.questionTotals.totalQuestions || 0;
-    const mTotal = payload.questionTotals.totalMarks || 0;
-    const chapters = (payload.chapters && payload.chapters.length) ? payload.chapters.join(', ') : '—';
-    const html = `
-      <div class="preview-card">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <h5 class="mb-0">Generated Paper Preview</h5>
-        </div>
-
-        <div class="mb-3">
-          <div><strong>Examination:</strong> ${payload.examName || '—'}</div>
-          <div><strong>School:</strong> ${payload.schoolName || '—'}</div>
-          <div><strong>Board:</strong> ${payload.schoolBoard || '—'}</div>
-          <div><strong>Class:</strong> ${payload.class || '—'}</div>
-          <div><strong>Subject:</strong> ${payload.subject || '—'}</div>
-          <div><strong>Chapters:</strong> ${chapters}</div>
-          <div class="mt-2"><strong>Questions:</strong> ${qTotal} &nbsp; <strong>Marks:</strong> ${mTotal}</div>
-        </div>
-
-        <div class="d-flex gap-2">
-          <button id="downloadPdfBtn" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF</button>
-          <button id="downloadWordBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-word me-1"></i>Download Word</button>
-          <button id="saveFromPreviewBtn" class="btn btn-primary btn-sm ms-auto"><i class="bi bi-save me-1"></i>Save as Template</button>
-          <button id="downloadAnswerKeyBtn" class="btn btn-outline-success btn-sm">
-  <i class="bi bi-journal-text me-1"></i>Download Answer Key
-</button>
-
-        </div>
-      </div>
-    `;
-    container.innerHTML = html;
-
-// save current preview as template
-document.getElementById('saveFromPreviewBtn').addEventListener('click', () => {
-  saveTemplate(); // reuse saveTemplate to persist current payload
-  renderTemplates();
-  alert('Template saved locally from preview.');
-});
-
-/* ===================== showGenerated (old API fallback) ===================== */
-function showGenerated(data) {
-  const container = document.getElementById('generatedPaperContainer');
-  const summary = data.summary || data || {};
-  const questions = data.questions || [];
-
-  container.innerHTML = `
-    <div class="main-card p-4 my-4">
-      <h4 class="mb-3">Generated Paper</h4>
-      <p><strong>Total Questions:</strong> ${summary.total_questions || summary.totalQuestions || 0}</p>
-      <p><strong>Total Marks:</strong> ${summary.total_marks || summary.totalMarks || 0}</p>
-      <ol class="mt-3">
-        ${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}
-      </ol>
-    </div>
-  `;
-}
-
-
-  // build a normalized payload for saving (fallbacks to current form if API omits fields)
-  const paperPayload = {
-    schoolName: summary.schoolName || schoolNameEl.value.trim(),
-    schoolBoard: summary.schoolBoard || boardEl.value,
-    class: summary.class || classEl.value,
-    subject: summary.subject || subjectEl.value,
-    chapters: summary.chapters || Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value),
-    questionTotals: {
-      totalQuestions: summary.total_questions || summary.totalQuestions || questions.length || 0,
-      totalMarks: summary.total_marks || summary.totalMarks || 0
-    },
-    questions
-  };
-
-  saveGeneratedPaper(paperPayload);
-  renderGeneratedPapers();
-
-  container.innerHTML = `
-    <div class="main-card p-4 my-4">
-      <h4 class="mb-3">Generated Paper</h4>
-      <p><strong>Total Questions:</strong> ${paperPayload.questionTotals.totalQuestions}</p>
-      <p><strong>Total Marks:</strong> ${paperPayload.questionTotals.totalMarks}</p>
-      <ol class="mt-3">${questions.map(q => `<li>${q.question_type} (${q.marks} marks) [${q.difficulty}] — ${q.question_text}</li>`).join('')}</ol>
-    </div>
-  `;
-}
-
-  
-
-  /* ===================== Distribution bar logic ===================== */
-  function updateDistribution(){
-    const p1 = parseFloat(handle1.style.left) || 40;
-    const p2 = parseFloat(handle2.style.left) || 80;
-    const easyPercent = Math.round(p1);
-    const medPercent = Math.round(p2 - p1);
-    const hardPercent = 100 - easyPercent - medPercent;
-    easySeg.style.width = easyPercent + '%';
-    medSeg.style.width = medPercent + '%';
-    hardSeg.style.width = hardPercent + '%';
-    easyValueEl.textContent = easyPercent + '%';
-    medValueEl.textContent = medPercent + '%';
-    hardValueEl.textContent = hardPercent + '%';
-  }
-
-  function makeDraggable(handle){
-    let dragging = false;
-    handle.addEventListener('mousedown', (ev)=> {
-      dragging = true; document.body.style.cursor = 'ew-resize';
-      ev.preventDefault();
-    });
-    document.addEventListener('mouseup', ()=> { dragging = false; document.body.style.cursor = 'default'; });
-    document.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
-      const rect = document.getElementById('distributionBar').getBoundingClientRect();
-      let percent = ((e.clientX - rect.left) / rect.width) * 100;
-      percent = Math.max(0, Math.min(100, percent));
-      if (handle === handle1) {
-        const rightLimit = parseFloat(handle2.style.left) || 80;
-        percent = Math.min(percent, rightLimit);
-      } else {
-        const leftLimit = parseFloat(handle1.style.left) || 40;
-        percent = Math.max(percent, leftLimit);
-      }
-      handle.style.left = percent + '%';
-      updateDistribution();
-    });
-  }
-
-  /* ===================== Templates (localStorage) ===================== */
-  function saveTemplate(){
-    const payload = buildPayload();
-    const store = JSON.parse(localStorage.getItem('qp_templates') || '[]');
-    const name = (payload.schoolName || 'Template') + ' — ' + (payload.subject || 'Subject') + ' (Class ' + (payload.class || '?') + ')';
-    const tpl = { name, data: payload, createdAt: new Date().toISOString() };
-    store.push(tpl);
-    localStorage.setItem('qp_templates', JSON.stringify(store));
-    renderTemplates();
-  }
-
-  function renderTemplates(){
-    const list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
-    savedTemplatesGrid.innerHTML = '';
-    if (!list.length) {
-      savedTemplatesGrid.innerHTML = '<div class="text-muted">No saved templates</div>';
-      return;
-    }
-    list.forEach((tpl, idx) => {
-      const card = document.createElement('div');
-      card.className = 'template-card';
-      card.innerHTML = `
-        <div>
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <h6 class="mb-1" style="font-size:0.95rem;">${tpl.name}</h6>
-              <div class="small text-muted">${new Date(tpl.createdAt).toLocaleString()}</div>
-            </div>
-            <div class="text-end">
-              <div class="small text-muted">Q: ${tpl.data.questionTotals ? tpl.data.questionTotals.totalQuestions : 0}</div>
-              <div class="small text-muted">M: ${tpl.data.questionTotals ? tpl.data.questionTotals.totalMarks : 0}</div>
-            </div>
-          </div>
-          <div class="small mb-2"><strong>Board:</strong> ${tpl.data.schoolBoard} &nbsp; <strong>Class:</strong> ${tpl.data.class}</div>
-          <div class="mb-2"><strong>Subject:</strong> ${tpl.data.subject}</div>
-          <div class="mb-2">${(tpl.data.chapters || []).slice(0,6).map(c => `<span class="badge text-bg-secondary me-1 mb-1">${c}</span>`).join(' ') || '<span class="text-muted">No chapters</span>'}</div>
-        </div>
-        <div class="d-flex gap-2 mt-2">
-          <button class="btn btn-sm btn-primary load-btn" data-idx="${idx}"><i class="bi bi-box-arrow-in-down me-1"></i>Load</button>
-          <button class="btn btn-sm btn-danger del-btn" data-idx="${idx}"><i class="bi bi-trash me-1"></i>Delete</button>
-        </div>
-      `;
-      savedTemplatesGrid.appendChild(card);
-    });
-
-    // attach handlers
-    savedTemplatesGrid.querySelectorAll('.load-btn').forEach(b => b.addEventListener('click', () => {
-      const idx = parseInt(b.dataset.idx,10);
-      const list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
-      applyTemplate(list[idx]);
-      // close offcanvas so user can see the loaded form
-      const offcanvasEl = document.getElementById('templatesOffcanvas');
-      const bs = bootstrap.Offcanvas.getInstance(offcanvasEl) || new bootstrap.Offcanvas(offcanvasEl);
-      bs.hide();
-      showStep(0);
-      updateSummary();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }));
-
-    savedTemplatesGrid.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', () => {
-      const idx = parseInt(b.dataset.idx,10);
-      if (!confirm('Delete this template?')) return;
-      let list = JSON.parse(localStorage.getItem('qp_templates') || '[]');
-      list.splice(idx,1);
-      localStorage.setItem('qp_templates', JSON.stringify(list));
-      renderTemplates();
-    }));
-    /* ===================== Generated Papers (localStorage) ===================== */
-function getGeneratedPapers(){
-  return JSON.parse(localStorage.getItem('qp_generated_papers') || '[]');
-}
-function setGeneratedPapers(list){
-  localStorage.setItem('qp_generated_papers', JSON.stringify(list));
-}
-function saveGeneratedPaper(data){
-  const list = getGeneratedPapers();
-  const rec = {
-    id: Date.now() + '-' + Math.random().toString(36).slice(2),
-    name: `${data.subject || 'Subject'} — Class ${data.class || '?'}`,
-    data,
-    createdAt: new Date().toISOString()
-  };
-  list.unshift(rec);            // newest first
-  setGeneratedPapers(list);
-}
-
-function renderGeneratedPapers(){
-  const list = getGeneratedPapers();
-  generatedPapersGrid.innerHTML = '';
-  if (!list.length){
-    generatedPapersGrid.innerHTML = '<div class="text-muted">No generated papers yet</div>';
-    return;
-  }
-  list.forEach((rec, idx) => {
-    const d = rec.data || {};
-    const card = document.createElement('div');
-    card.className = 'template-card';
-    card.innerHTML = `
-      <div>
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <h6 class="mb-1" style="font-size:0.95rem;">${rec.name}</h6>
-            <div class="small text-muted">${new Date(rec.createdAt).toLocaleString()}</div>
-          </div>
-          <div class="text-end">
-            <div class="small text-muted">Q: ${d.questionTotals?.totalQuestions || 0}</div>
-            <div class="small text-muted">M: ${d.questionTotals?.totalMarks || 0}</div>
-          </div>
-        </div>
-        <div class="small mb-2"><strong>Board:</strong> ${d.schoolBoard || '—'} &nbsp; <strong>Class:</strong> ${d.class || '—'}</div>
-        <div class="mb-2"><strong>Subject:</strong> ${d.subject || '—'}</div>
-        <div class="mb-2">
-          ${(d.chapters || []).slice(0,6).map(c => `<span class="badge text-bg-secondary me-1 mb-1">${c}</span>`).join(' ') || '<span class="text-muted">No chapters</span>'}
-        </div>
-      </div>
-      <div class="d-flex gap-2 mt-2">
-        <button class="btn btn-sm btn-outline-primary gp-preview-btn" data-idx="${idx}">
-          <i class="bi bi-eye me-1"></i>Preview
-        </button>
-        <button class="btn btn-sm btn-outline-success gp-ans-btn" data-idx="${idx}">
-          <i class="bi bi-journal-text me-1"></i>Answer Key
-        </button>
-        <button class="btn btn-sm btn-outline-danger gp-del-btn" data-idx="${idx}">
-          <i class="bi bi-trash me-1"></i>Delete
-        </button>
-      </div>
-    `;
-    generatedPapersGrid.appendChild(card);
-  });
-
-  // attach handlers
-  generatedPapersGrid.querySelectorAll('.gp-preview-btn').forEach(b => b.addEventListener('click', () => {
-    const idx = parseInt(b.dataset.idx,10);
-    const list = getGeneratedPapers();
-    if (list[idx]) showGeneratedPreview(list[idx].data);
-  }));
-  generatedPapersGrid.querySelectorAll('.gp-ans-btn').forEach(b => b.addEventListener('click', () => {
-    const idx = parseInt(b.dataset.idx,10);
-    const list = getGeneratedPapers();
-    if (list[idx]) downloadAnswerKeyFor(list[idx].data);
-  }));
-  generatedPapersGrid.querySelectorAll('.gp-del-btn').forEach(b => b.addEventListener('click', () => {
-    const idx = parseInt(b.dataset.idx,10);
-    if (!confirm('Delete this paper from history?')) return;
-    const list = getGeneratedPapers();
-    list.splice(idx,1);
-    setGeneratedPapers(list);
-    renderGeneratedPapers();
-  }));
-}
-
-// clear-all button
-clearAllPapersBtn?.addEventListener('click', () => {
-  if (!confirm('Clear all generated papers?')) return;
-  localStorage.removeItem('qp_generated_papers');
-  renderGeneratedPapers();
-});
-
-// helper used by both Preview panel and list
-function downloadAnswerKeyFor(d){
-  let txt = `
-Answer Key
-School: ${d.schoolName || '—'}
-Board: ${d.schoolBoard || '—'}
-Class: ${d.class || '—'}
-Subject: ${d.subject || '—'}
-
-Chapters: ${(d.chapters && d.chapters.length) ? d.chapters.join(', ') : '—'}
-
-Questions: ${d.questionTotals?.totalQuestions ?? '—'}
-Marks: ${d.questionTotals?.totalMarks ?? '—'}
-
-====================
-ANSWERS
-====================
-`;
-  if (Array.isArray(d.questions) && d.questions.length){
-    d.questions.forEach((q, i) => {
-      txt += `Q${i+1}. ${q?.answer || '(No answer provided)'}\n\n`;
-    });
-  } else {
-    txt += '(No answers available)';
-  }
-  const blob = new Blob([txt], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Answer_Key_${(d.subject||'Subject')}_Class${(d.class||'?')}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-  }
-
-  function applyTemplate(tpl){
-    if (!tpl || !tpl.data) return;
-    const d = tpl.data;
-    schoolNameEl.value = d.schoolName || '';
-    boardEl.value = d.schoolBoard || '';
-    // populate subjects immediately without using events
-    subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
-    if (d.class) {
-      classEl.value = d.class;
-      const list = (subjects[d.schoolBoard] && subjects[d.schoolBoard][d.class]) ? subjects[d.schoolBoard][d.class] : [];
-      subjectEl.disabled = false;
-      subjectEl.innerHTML = '<option selected disabled value="">Choose...</option>';
-      list.forEach(s => subjectEl.add(new Option(s, s)));
-    }
-    subjectEl.value = d.subject || '';
-    populateChapters();
-    // set chapters & other settings after short delay to allow DOM update
-    setTimeout(()=> {
-      chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => {
-        cb.checked = d.chapters && d.chapters.includes(cb.value);
-      });
-      // apply question distribution
-      if (d.questionDistribution) {
-        document.querySelectorAll('.question-type-group').forEach(group => {
-          const label = group.querySelector('.form-label.fw-bold').textContent.trim();
-          const info = d.questionDistribution[label];
-          group.querySelector('.question-count').value = info ? info.count : 0;
-          group.querySelector('.marks-per-question').value = info ? info.marks : group.querySelector('.marks-per-question').value;
-        });
-      }
-      // difficulty
-      if (d.difficultyDistribution) {
-        const e = parseInt(d.difficultyDistribution.Easy || 0);
-        const m = parseInt(d.difficultyDistribution.Medium || 0);
-        const p1 = e;
-        const p2 = e + m;
-        handle1.style.left = p1 + '%';
-        handle2.style.left = p2 + '%';
-        updateDistribution();
-      }
-      updateSummary();
-    },150);
-  }
-
-  /* ===================== Utility calls on load ===================== */
-  function renderTemplatesIfAny(){ renderTemplates(); }
-  renderTemplatesIfAny();
-
-  </script>
-
-  <!-- Bootstrap JS (bundle) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- STATE ---
+        let currentStep = 0;
+        let generationMode = 'class';
+
+        // --- DATA ---
+        const subjects = {
+            CBSE: {
+                1: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'EVS',hi:'ईवीएस'}],
+                2: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'EVS',hi:'ईवीएस'}],
+                3: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                4: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                5: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                6: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                7: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                8: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                9: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                10: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                11: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                12: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}]
+            },
+            ICSE: {
+                1: [{en:'English',hi:'अंग्रेजी'},{en:'Environmental Studies',hi:'पर्यावरण अध्ययन'}],
+                2: [{en:'English',hi:'अंग्रेजी'},{en:'Environmental Studies',hi:'पर्यावरण अध्ययन'}],
+                3: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Environmental Studies',hi:'पर्यावरण अध्ययन'}],
+                4: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Environmental Studies',hi:'पर्यावरण अध्ययन'}],
+                5: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Environmental Studies',hi:'पर्यावरण अध्ययन'}],
+                6: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                7: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                8: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                9: [{en:'Mathematics',hi:'गणित'},{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Biology',hi:'जीव विज्ञान'},{en:'History & Civics',hi:'इतिहास और नागरिक शास्त्र'},{en:'Geography',hi:'भूगोल'},{en:'Computer',hi:'कंप्यूटर'},{en:'English Grammar',hi:'अंग्रेजी व्याकरण'}],
+                10: [{en:'Mathematics',hi:'गणित'},{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Biology',hi:'जीव विज्ञान'},{en:'History & Civics',hi:'इतिहास और नागरिक शास्त्र'},{en:'Geography',hi:'भूगोल'},{en:'Computer',hi:'कंप्यूटर'},{en:'English Grammar',hi:'अंग्रेजी व्याकरण'}],
+                11: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                12: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}]
+            },
+            "State Board": {
+                1: [{en:'English',hi:'अंग्रेजी'},{en:'Regional Language',hi:'क्षेत्रीय भाषा'}],
+                2: [{en:'English',hi:'अंग्रेजी'},{en:'Regional Language',hi:'क्षेत्रीय भाषा'}],
+                3: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                4: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                5: [{en:'English',hi:'अंग्रेजी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'}],
+                6: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                7: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                8: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'}],
+                9: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                10: [{en:'English',hi:'अंग्रेजी'},{en:'Hindi',hi:'हिन्दी'},{en:'Mathematics',hi:'गणित'},{en:'Science',hi:'विज्ञान'},{en:'Social Science',hi:'सामाजिक विज्ञान'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                11: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}],
+                12: [{en:'English',hi:'अंग्रेजी'},{en:'Physics',hi:'भौतिक विज्ञान'},{en:'Chemistry',hi:'रसायन विज्ञान'},{en:'Mathematics',hi:'गणित'},{en:'Biology',hi:'जीव विज्ञान'},{en:'Economics',hi:'अर्थशास्त्र'},{en:'Accountancy',hi:'लेखाकर्म'},{en:'Computer Science',hi:'कंप्यूटर विज्ञान'}]
+            }
+        };
+        const chaptersData = {
+            CBSE: {
+                10: {
+                    Science: ["Chemical Reactions", "Acids, Bases and Salts", "Life Processes"],
+                    Mathematics: ["Real Numbers", "Polynomials", "Triangles"]
+                }
+            }
+        };
+        const questionTypes = [
+            { id: 'MCQ', labelKey: 'mcq', defaultMarks: 1 }, { id: 'Fill', labelKey: 'fillInBlanks', defaultMarks: 1 },
+            { id: 'Short', labelKey: 'shortAnswer', defaultMarks: 3 }, { id: 'Long', labelKey: 'longAnswer', defaultMarks: 5 },
+            { id: 'Match', labelKey: 'matching', defaultMarks: 4 }, { id: 'Case', labelKey: 'caseStudy', defaultMarks: 5 }
+        ];
+        const langData = { en: {title: "Intelligent Paper Generator", subtitle: "Build assessments quickly.", generatedPapers: "Generated Papers", finalPreview: "Final Preview", step1Title: "Step 1: Core Details", generationMode: "Generation Mode", byTopic: "By Topic", byClassAndChapters: "By Class & Chapters", schoolBoard: "School Board", selectBoard: "Select Board...", paperLanguage: "Paper Language", topic: "Topic", class: "Class", selectClass: "Select Class...", subject: "Subject", selectSubject: "Select Subject...", chapters: "Chapters", selectAll: "Select All", deselectAll: "Deselect All", selectClassSubjectPrompt: "Please select a board, class and subject.", next: "Next", previous: "Previous", step2Title: "Step 2: Questions & Difficulty", mcq: "Multiple Choice", fillInBlanks: "Fill in the Blanks", shortAnswer: "Short Answer", longAnswer: "Long Answer", matching: "Matching", caseStudy: "Case Study", marks: "Marks", difficultyDistribution: "Difficulty Distribution", questions: "Questions", totalMarks: "Total Marks", step3Title: "Step 3: Final Details", examName: "Examination Name", schoolName: "School Name", optional: "(Optional)", generatePaper: "Generate Paper", easy: "Easy", medium: "Medium", hard: "Hard", noPapers: "No papers generated yet.", downloadPaper: "Download Paper", downloadAnswers: "Download Answers"}, hi: { title: "इंटेलिजेंट पेपर जेनरेटर", subtitle: "आसानी से मूल्यांकन बनाएं।", generatedPapers: "जेनरेट किए गए पेपर", finalPreview: "अंतिम पूर्वावलोकन", step1Title: "चरण 1: मुख्य विवरण", generationMode: "जनरेशन मोड", byTopic: "विषय के अनुसार", byClassAndChapters: "कक्षा और अध्याय के अनुसार", schoolBoard: "स्कूल बोर्ड", selectBoard: "बोर्ड चुनें...", paperLanguage: "पेपर की भाषा", topic: "विषय", class: "कक्षा", selectClass: "कक्षा चुनें...", subject: "विषय", selectSubject: "विषय चुनें...", chapters: "अध्याय", selectAll: "सभी चुनें", deselectAll: "सभी अचयनित करें", selectClassSubjectPrompt: "कृपया बोर्ड, कक्षा और विषय चुनें।", next: "अगला", previous: "पिछला", step2Title: "चरण 2: प्रश्न और कठिनाई", mcq: "बहुविकल्पीय", fillInBlanks: "रिक्त स्थान भरें", shortAnswer: "लघु उत्तरीय", longAnswer: "दीर्घ उत्तरीय", matching: "मिलान", caseStudy: "केस स्टडी", marks: "अंक", difficultyDistribution: "कठिनाई वितरण", questions: "प्रश्न", totalMarks: "कुल अंक", step3Title: "चरण 3: अंतिम विवरण", examName: "परीक्षा का नाम", schoolName: "स्कूल का नाम", optional: "(वैकल्पिक)", generatePaper: "पेपर जेनरेट करें", easy: "आसान", medium: "मध्यम", hard: "कठिन", noPapers: "अभी तक कोई पेपर नहीं बनाया गया है।", downloadPaper: "पेपर डाउनलोड करें", downloadAnswers: "उत्तर कुंजी डाउनलोड करें" }};
+
+        // --- DOM ELEMENTS ---
+        const steps = Array.from(document.querySelectorAll('.form-step'));
+        const progressBar = document.getElementById('progressBar');
+        const [modeTopicBtn, modeClassBtn] = [document.getElementById('modeTopicBtn'), document.getElementById('modeClassBtn')];
+        const classRelatedFields = ['classField', 'subjectField', 'chaptersField'].map(id => document.getElementById(id));
+        const topicField = document.getElementById('topicField');
+        const [schoolBoard, classSelect, subjectSelect, chaptersContainer, topicInput, examName, schoolName] = [document.getElementById('schoolBoard'), document.getElementById('classSelect'), document.getElementById('subjectSelect'), document.getElementById('chaptersContainer'), document.getElementById('topic'), document.getElementById('examName'), document.getElementById('schoolName')];
+        const [selectAllChaptersBtn, deselectAllChaptersBtn] = [document.getElementById('selectAllChapters'), document.getElementById('deselectAllChapters')];
+        const qTypesContainer = document.getElementById('questionTypesContainer');
+        const [handle1, handle2, easySeg, medSeg, hardSeg, easyValueEl, medValueEl, hardValueEl] = [document.getElementById('handle1'), document.getElementById('handle2'), document.getElementById('easySeg'), document.getElementById('medSeg'), document.getElementById('hardSeg'), document.getElementById('easyValueEl'), document.getElementById('medValueEl'), document.getElementById('hardValueEl')];
+        const [darkModeToggle, langEnBtn, langHiBtn] = [document.getElementById('darkModeToggle'), document.getElementById('langEn'), document.getElementById('langHi')];
+        const generatedPapersContainer = document.getElementById('generatedPapersContainer');
+        const finalPreviewContent = document.getElementById('finalPreviewContent');
+        const step2TotalMarks = document.getElementById('step2TotalMarks');
+
+        // --- FUNCTIONS ---
+        const getLangText = key => langData[document.documentElement.lang || 'en'][key] || key;
+        
+        const showStep = (idx) => {
+            if (idx > currentStep && !validateStep(currentStep)) return;
+            steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+            currentStep = idx;
+            progressBar.style.width = (currentStep / (steps.length - 1)) * 100 + '%';
+            if (idx === 2) {
+                updateFinalPreview();
+            }
+        };
+
+        const validateStep = (idx) => {
+            const stepEl = steps[idx];
+            const requireds = stepEl.querySelectorAll('input[required]:not(:disabled), select[required]:not(:disabled)');
+            let ok = true;
+            requireds.forEach(el => {
+                if (!el.value || el.value === '') {
+                    el.classList.add('is-invalid');
+                    ok = false;
+                } else {
+                    el.classList.remove('is-invalid');
+                }
+            });
+            return ok;
+        };
+        
+        const setGenerationMode = (mode) => {
+            generationMode = mode;
+            const isTopic = mode === 'topic';
+            modeTopicBtn.classList.toggle('btn-primary', isTopic);
+            modeTopicBtn.classList.toggle('btn-outline-secondary', !isTopic);
+            modeClassBtn.classList.toggle('btn-primary', !isTopic);
+            modeClassBtn.classList.toggle('btn-outline-secondary', isTopic);
+            
+            topicField.style.display = isTopic ? 'block' : 'none';
+            topicInput.required = isTopic;
+            topicInput.disabled = !isTopic;
+            
+            classRelatedFields.forEach(field => field.style.display = isTopic ? 'none' : 'block');
+            [classSelect, subjectSelect].forEach(el => { el.required = !isTopic; el.disabled = isTopic; });
+        };
+
+        const populateClasses = () => {
+            classSelect.innerHTML = `<option value="">${getLangText('selectClass')}</option>`;
+            for (let i = 1; i <= 12; i++) {
+                classSelect.add(new Option(i, i));
+            }
+        };
+
+        const populateSubjects = () => {
+            const board = schoolBoard.value;
+            const cls = classSelect.value;
+            const currentSubjectValue = subjectSelect.value;
+            const currentLang = document.documentElement.lang || 'en';
+            subjectSelect.innerHTML = `<option value="">${getLangText('selectSubject')}</option>`;
+            clearChapters();
+            if (board && cls && subjects[board] && subjects[board][cls]) {
+                subjects[board][cls].forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.en;
+                    option.textContent = subject[currentLang] || subject.en;
+                    subjectSelect.appendChild(option);
+                });
+            }
+            subjectSelect.value = currentSubjectValue;
+        };
+
+        const populateChapters = () => {
+            const board = schoolBoard.value;
+            const cls = classSelect.value;
+            const subj = subjectSelect.value;
+            clearChapters();
+            const chapters = chaptersData?.[board]?.[cls]?.[subj] || [];
+            if (!chapters.length) {
+                clearChapters('No chapters available for this selection.');
+                return;
+            }
+            chapters.forEach((ch, idx) => {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                div.innerHTML = `<input class="form-check-input chapter-checkbox" type="checkbox" id="chap-${idx}" value="${ch}"><label class="form-check-label" for="chap-${idx}">${ch}</label>`;
+                chaptersContainer.appendChild(div);
+            });
+            selectAllChaptersBtn.disabled = false;
+            deselectAllChaptersBtn.disabled = false;
+        };
+
+        const clearChapters = (msg = getLangText('selectClassSubjectPrompt')) => {
+            chaptersContainer.innerHTML = `<small class="text-muted">${msg}</small>`;
+            selectAllChaptersBtn.disabled = true;
+            deselectAllChaptersBtn.disabled = true;
+        };
+
+        const updateFinalPreview = () => {
+            const data = buildPayload();
+            let html = '<ul class="list-unstyled">';
+            
+            if(data.mode === 'class') {
+                html += `<li><strong>${getLangText('schoolBoard')}:</strong> ${data.board}</li>`;
+                html += `<li><strong>${getLangText('class')}:</strong> ${data.class}</li>`;
+                html += `<li><strong>${getLangText('subject')}:</strong> ${data.subject_hi}</li>`;
+                html += `<li><strong>${getLangText('chapters')}:</strong> ${data.chapters.length > 0 ? data.chapters.join(', ') : 'All'}</li>`;
+            } else {
+                html += `<li><strong>${getLangText('topic')}:</strong> ${data.topic}</li>`;
+            }
+            html += `<hr class="my-2">`;
+            html += `<li><strong>${getLangText('totalMarks')}:</strong> ${data.totals.marks}</li>`;
+            html += `<li><strong>${getLangText('questions')}:</strong> ${data.totals.questions}</li>`;
+            html += `</ul>`;
+
+            finalPreviewContent.innerHTML = html;
+        };
+
+        const switchLanguage = (lang) => {
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                el.textContent = getLangText(el.dataset.langKey);
+            });
+            langHiBtn.classList.toggle('active', lang === 'hi');
+            langEnBtn.classList.toggle('active', lang === 'en');
+            populateSubjects();
+            updateDistribution();
+            injectQuestionTypes();
+            renderGeneratedPapers();
+            updateStep2Totals();
+        };
+
+        // --- SLIDER LOGIC ---
+        let activeHandle = null;
+
+        function updateDistribution() {
+            const p1 = parseFloat(handle1.style.left);
+            const p2 = parseFloat(handle2.style.left);
+            const easyPercent = Math.round(p1);
+            const medPercent = Math.round(p2 - p1);
+            const hardPercent = 100 - easyPercent - medPercent;
+            
+            easySeg.style.width = easyPercent + '%';
+            medSeg.style.width = medPercent + '%';
+            hardSeg.style.width = hardPercent + '%';
+            
+            easyValueEl.textContent = easyPercent + '%';
+            medValueEl.textContent = medPercent + '%';
+            hardValueEl.textContent = hardPercent + '%';
+        }
+
+        const onMouseMove = (moveEvent) => {
+            if (!activeHandle) return;
+
+            const rect = document.getElementById('distributionBar').getBoundingClientRect();
+            let percent = ((moveEvent.clientX - rect.left) / rect.width) * 100;
+            percent = Math.max(0, Math.min(100, percent));
+
+            if (activeHandle.id === 'handle1') {
+                const rightLimit = parseFloat(handle2.style.left);
+                percent = Math.min(percent, rightLimit);
+            } else { 
+                const leftLimit = parseFloat(handle1.style.left);
+                percent = Math.max(percent, leftLimit);
+            }
+
+            activeHandle.style.left = percent + '%';
+            updateDistribution();
+        };
+
+        const onMouseUp = () => {
+            if (!activeHandle) return;
+            document.body.style.cursor = 'default';
+            activeHandle = null;
+        };
+        
+        function activateHandle(handle, event) {
+            event.preventDefault();
+            document.body.style.cursor = 'ew-resize';
+            activeHandle = handle;
+        }
+        
+        handle1.addEventListener('mousedown', (e) => activateHandle(handle1, e));
+        handle2.addEventListener('mousedown', (e) => activateHandle(handle2, e));
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        
+        const updateStep2Totals = () => {
+            let totalM = 0;
+            qTypesContainer.querySelectorAll('.question-type-group').forEach(group => {
+                const count = parseInt(group.querySelector('.question-count').value) || 0;
+                const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
+                totalM += count * marks;
+            });
+            step2TotalMarks.textContent = totalM;
+        };
+
+        function injectQuestionTypes() {
+            const values = {};
+            qTypesContainer.querySelectorAll('.question-count').forEach((el, idx) => { values[idx] = el.value });
+
+            qTypesContainer.innerHTML = questionTypes.map((q, idx) => `
+              <div class="col-md-6 question-type-group">
+                <label class="form-label fw-bold">${getLangText(q.labelKey)}</label>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <div class="input-group">
+                      <span class="input-group-text">#</span>
+                      <input type="number" class="form-control question-count" value="${values[idx] || 0}" min="0" required>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="input-group">
+                      <span class="input-group-text">${getLangText('marks')}</span>
+                      <input type="number" class="form-control marks-per-question" value="${q.defaultMarks}" min="1" required>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+        }
+
+        function savePaper() {
+            const paperData = buildPayload();
+            let papers = JSON.parse(localStorage.getItem('generatedPapers') || '[]');
+            papers.unshift(paperData);
+            localStorage.setItem('generatedPapers', JSON.stringify(papers));
+            alert('Paper Generated and Saved!');
+            renderGeneratedPapers();
+        }
+
+        function buildPayload() {
+            const payload = {
+                id: Date.now(),
+                mode: generationMode,
+                examName: examName.value || 'Untitled Exam',
+                schoolName: schoolName.value,
+                board: schoolBoard.value,
+                paperLang: document.getElementById('paperLanguage').value,
+                questionTypes: {},
+                difficulty: {}
+            };
+
+            if (generationMode === 'topic') {
+                payload.topic = topicInput.value;
+            } else {
+                payload.class = classSelect.value;
+                payload.subject = subjectSelect.value;
+                payload.subject_hi = subjectSelect.options[subjectSelect.selectedIndex]?.textContent || subjectSelect.value;
+                payload.chapters = Array.from(chaptersContainer.querySelectorAll('.chapter-checkbox:checked')).map(cb => cb.value);
+            }
+            
+            let totalQ = 0, totalM = 0;
+            qTypesContainer.querySelectorAll('.question-type-group').forEach(group => {
+                const label = group.querySelector('.form-label').textContent;
+                const count = parseInt(group.querySelector('.question-count').value) || 0;
+                const marks = parseInt(group.querySelector('.marks-per-question').value) || 0;
+                if(count > 0) payload.questionTypes[label] = { count, marks };
+                totalQ += count;
+                totalM += count * marks;
+            });
+            payload.totals = { questions: totalQ, marks: totalM };
+
+            payload.difficulty = { easy: easyValueEl.textContent, medium: medValueEl.textContent, hard: hardValueEl.textContent };
+            return payload;
+        }
+        
+        function renderGeneratedPapers() {
+            const papers = JSON.parse(localStorage.getItem('generatedPapers') || '[]');
+            if (papers.length === 0) {
+                generatedPapersContainer.innerHTML = `<p class="text-muted">${getLangText('noPapers')}</p>`;
+                return;
+            }
+
+            generatedPapersContainer.innerHTML = papers.map(paper => {
+                 const subjectDisplay = document.documentElement.lang === 'hi' ? paper.subject_hi : paper.subject;
+                 return `
+                <div class="paper-history-card">
+                    <h6 class="fw-bold">${paper.examName}</h6>
+                    <p class="mb-1 small">
+                        ${paper.mode === 'topic' ? `<strong>${getLangText('topic')}:</strong> ${paper.topic}` : `<strong>${getLangText('class')}:</strong> ${paper.class} | <strong>${getLangText('subject')}:</strong> ${subjectDisplay}`}
+                    </p>
+                    <p class="mb-2 small"><strong>${getLangText('questions')}:</strong> ${paper.totals.questions} | <strong>${getLangText('totalMarks')}:</strong> ${paper.totals.marks}</p>
+                    <div class="d-flex gap-2">
+                         <button class="btn btn-sm btn-outline-primary download-paper-btn" data-id="${paper.id}">${getLangText('downloadPaper')}</button>
+                         <button class="btn btn-sm btn-outline-success download-answers-btn" data-id="${paper.id}">${getLangText('downloadAnswers')}</button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function downloadAsTextFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function handleDownload(paperId, type) {
+            const papers = JSON.parse(localStorage.getItem('generatedPapers') || '[]');
+            const paper = papers.find(p => p.id == paperId);
+            if (!paper) return;
+
+            let content = ``;
+            let filename = ``;
+
+            if (type === 'paper') {
+                content += `PAPER SUMMARY\n====================\n`;
+                content += `Exam Name: ${paper.examName}\n`;
+                content += `School: ${paper.schoolName || 'N/A'}\n`;
+                if(paper.mode === 'class') {
+                    content += `Board: ${paper.board}\nClass: ${paper.class}\nSubject: ${paper.subject}\n`;
+                    content += `Chapters: ${paper.chapters.length > 0 ? paper.chapters.join(', ') : 'All'}\n`;
+                } else {
+                    content += `Topic: ${paper.topic}\n`;
+                }
+                content += `\nTotal Questions: ${paper.totals.questions}\nTotal Marks: ${paper.totals.marks}\n`;
+                content += `\nQUESTION DISTRIBUTION:\n`;
+                for(const [q, details] of Object.entries(paper.questionTypes)) {
+                    content += `- ${q}: ${details.count} questions, ${details.marks} marks each\n`;
+                }
+                filename = `${paper.examName.replace(/\s+/g, '_')}_Paper.txt`;
+            } else { // Answer Key
+                content += `ANSWER KEY\n====================\n`;
+                content += `Exam Name: ${paper.examName}\n\n`;
+                let qNum = 1;
+                for(const [q, details] of Object.entries(paper.questionTypes)) {
+                    for(let i=0; i<details.count; i++) {
+                         content += `Q${qNum++} (${q}): [Placeholder Answer]\n`;
+                    }
+                }
+                filename = `${paper.examName.replace(/\s+/g, '_')}_AnswerKey.txt`;
+            }
+
+            downloadAsTextFile(content, filename);
+        }
+
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.next-btn')) showStep(currentStep + 1);
+            if (e.target.closest('.prev-btn')) showStep(currentStep - 1);
+            if (e.target.closest('.download-paper-btn')) handleDownload(e.target.dataset.id, 'paper');
+            if (e.target.closest('.download-answers-btn')) handleDownload(e.target.dataset.id, 'answers');
+        });
+        
+        qTypesContainer.addEventListener('input', updateStep2Totals);
+        [modeTopicBtn, modeClassBtn].forEach(btn => btn.addEventListener('click', (e) => setGenerationMode(e.target.id === 'modeTopicBtn' ? 'topic' : 'class')));
+        schoolBoard.addEventListener('change', populateSubjects);
+        classSelect.addEventListener('change', populateSubjects);
+        subjectSelect.addEventListener('change', populateChapters);
+        selectAllChaptersBtn.addEventListener('click', () => { chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = true); });
+        deselectAllChaptersBtn.addEventListener('click', () => { chaptersContainer.querySelectorAll('.chapter-checkbox').forEach(cb => cb.checked = false); });
+        
+        document.getElementById('generatePaperBtn').addEventListener('click', () => {
+             if (validateStep(currentStep)) {
+                savePaper();
+             }
+        });
+
+        darkModeToggle.addEventListener('change', () => {
+            const theme = darkModeToggle.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('darkMode', theme);
+        });
+        [langEnBtn, langHiBtn].forEach(btn => btn.addEventListener('click', (e) => switchLanguage(e.target.id === 'langEn' ? 'en' : 'hi')));
+
+        // --- INITIALIZATION ---
+        const savedTheme = localStorage.getItem('darkMode');
+        if (savedTheme === 'dark') {
+            darkModeToggle.checked = true;
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+        
+        populateClasses();
+        injectQuestionTypes();
+        showStep(0);
+        setGenerationMode('class');
+        switchLanguage('en'); // Default to English
+        renderGeneratedPapers();
+        updateStep2Totals();
+        updateDistribution();
+    });
+  </script>
 </body>
 </html>
